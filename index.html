@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;color:#2C2521;background:#F3EBD9;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  ::selection{background:#F3DAD5;}
+  input,textarea,button{font-family:inherit;}
+  textarea{resize:vertical;}
+  @keyframes mtcFadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes mtcSpin{to{transform:rotate(360deg);}}
+  @keyframes mtcPop{0%{transform:scale(.7);opacity:0;}60%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
+  @keyframes mtcFloat{0%{transform:translateY(0) rotate(0);opacity:0;}10%{opacity:1;}100%{transform:translateY(-120px) rotate(220deg);opacity:0;}}
+  @keyframes mtcPulse{0%,100%{box-shadow:0 0 0 0 rgba(153,0,0,.35);}50%{box-shadow:0 0 0 10px rgba(153,0,0,0);}}
+  .mtc-scroll::-webkit-scrollbar{height:8px;width:8px;}
+  .mtc-scroll::-webkit-scrollbar-thumb{background:#D9D2C4;border-radius:8px;}
+  @media print{
+    [data-noprint]{display:none !important;}
+    body{background:#fff;}
+    .mtc-panel{animation:none !important;}
+  }
+</style>
+<script type="module">
+  /* ══════════════════════════════════════════════════════════════════════
+     LIVE WARM-UP  ·  Firebase setup
+     Paste your Firebase web-app config between the braces below, then host
+     the file. Leave it blank to keep the warm-up local-only (no Live Wall).
+     Step-by-step instructions live in the app's "Live Wall" tab.
+     ══════════════════════════════════════════════════════════════════════ */
+  const FIREBASE_CONFIG = {
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
+  };
+  /* ════════════════════ no need to edit below this line ════════════════════ */
+  window.MTC_LIVE = { status: "init", error: "" };
+  const notify = () => window.dispatchEvent(new CustomEvent("mtc-live"));
+  if (!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId)) {
+    window.MTC_LIVE.status = "unconfigured"; notify();
+  } else {
+    try {
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
+      const fs = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js");
+      const db = fs.getFirestore(initializeApp(FIREBASE_CONFIG));
+      window.MTC_LIVE.submit = (session, payload) =>
+        fs.addDoc(fs.collection(db, "mtc-sessions", session, "responses"),
+                  Object.assign({}, payload, { ts: fs.serverTimestamp() }));
+      window.MTC_LIVE.subscribe = (session, cb) => {
+        const q = fs.query(fs.collection(db, "mtc-sessions", session, "responses"), fs.orderBy("ts", "asc"));
+        return fs.onSnapshot(q,
+          snap => { const a = []; snap.forEach(d => a.push(Object.assign({ id: d.id }, d.data()))); cb(a); },
+          err => { window.MTC_LIVE.status = "error"; window.MTC_LIVE.error = err.message; notify(); });
+      };
+      window.MTC_LIVE.status = "ready"; notify();
+    } catch (e) {
+      window.MTC_LIVE.status = "error"; window.MTC_LIVE.error = (e && e.message) || String(e); notify();
+    }
+  }
+</script>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+
+  <!-- ===== HEADER ===== -->
+  <header data-noprint="1" style="position:sticky;top:0;z-index:40;background:rgba(243,235,217,.94);backdrop-filter:blur(8px);border-bottom:1px solid #E4DECF;">
+    <div style="max-width:1120px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:20px;">
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:#7A0019;text-transform:uppercase;">Participant Workbook</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:22px;line-height:1;color:#2C2521;">Make the Case</div>
+      </div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;max-width:420px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <span style="font-size:11px;letter-spacing:.04em;color:#6B7785;text-transform:uppercase;font-weight:600;white-space:nowrap;">Portfolio progress</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#7A0019;font-weight:500;">{{ progressPct }}% built</span>
+        </div>
+        <div style="height:7px;border-radius:99px;background:#E6E0D2;overflow:hidden;">
+          <div style="height:100%;border-radius:99px;background:linear-gradient(90deg,#990000,#7A0019);transition:width .5s cubic-bezier(.22,1,.36,1);width:{{ progressPct }}%;"></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onClick="{{ openPresent }}" style="display:inline-flex;align-items:center;gap:7px;border:1px solid #E8D2CD;background:#F3E7E2;color:#7A0019;font-weight:600;font-size:13px;padding:9px 14px;border-radius:10px;cursor:pointer;" style-hover="background:#EDD9D4;">
+          <span style="width:8px;height:8px;border-radius:2px;background:#990000;display:inline-block;"></span>Present mode
+        </button>
+        <button onClick="{{ restart }}" title="Clear all your entries" style="border:1px solid #E4DECF;background:transparent;color:#8A8472;font-size:12px;padding:9px 11px;border-radius:10px;cursor:pointer;" style-hover="color:#990000;border-color:#E8CFCB;">Reset</button>
+      </div>
+    </div>
+
+    <!-- TAB NAV -->
+    <nav class="mtc-scroll" style="max-width:1120px;margin:0 auto;padding:0 22px 10px;display:flex;gap:6px;overflow-x:auto;">
+      <button onClick="{{ goTo0 }}" style="{{ tab0Style }}">Welcome</button>
+      <button onClick="{{ goTo1 }}" style="{{ tab1Style }}"><span style="font-family:'IBM Plex Mono',monospace;opacity:.7;margin-right:6px;">01</span>Narrative core<sc-if value="{{ done1 }}" hint-placeholder-val="{{ false }}"><span style="margin-left:7px;color:#2E7D54;font-weight:700;">✓</span></sc-if></button>
+      <button onClick="{{ goTo2 }}" style="{{ tab2Style }}"><span style="font-family:'IBM Plex Mono',monospace;opacity:.7;margin-right:6px;">02</span>Evidence map<sc-if value="{{ done2 }}" hint-placeholder-val="{{ false }}"><span style="margin-left:7px;color:#2E7D54;font-weight:700;">✓</span></sc-if></button>
+      <button onClick="{{ goTo3 }}" style="{{ tab3Style }}"><span style="font-family:'IBM Plex Mono',monospace;opacity:.7;margin-right:6px;">03</span>90-day plan<sc-if value="{{ done3 }}" hint-placeholder-val="{{ false }}"><span style="margin-left:7px;color:#2E7D54;font-weight:700;">✓</span></sc-if></button>
+      <button onClick="{{ goTo4 }}" style="{{ tab4Style }}">Hard parts</button>
+      <button onClick="{{ goTo5 }}" style="{{ tab5Style }}">Take-home</button>
+      <button onClick="{{ goTo6 }}" style="{{ tab6Style }}">Resources</button>
+      <button onClick="{{ goTo7 }}" style="{{ tab7Style }}">Your skeleton</button>
+      <button onClick="{{ goTo8 }}" style="{{ tab8Style }}"><span style="width:7px;height:7px;border-radius:50%;background:#990000;display:inline-block;margin-right:7px;"></span>Live Wall</button>
+    </nav>
+  </header>
+
+  <main style="flex:1;width:100%;">
+  <div style="max-width:1120px;margin:0 auto;padding:36px 28px 90px;">
+
+  <!-- ================= WELCOME ================= -->
+  <sc-if value="{{ isTab0 }}" hint-placeholder-val="{{ true }}">
+  <section class="mtc-panel" data-screen-label="Welcome" style="">
+    <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:34px;align-items:start;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:#7A0019;text-transform:uppercase;margin-bottom:16px;">The one idea</div>
+        <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:46px;line-height:1.08;margin:0 0 18px;letter-spacing:-.01em;">A teaching portfolio is an <span style="color:#7A0019;">argument</span>, not an <span style="text-decoration:line-through;text-decoration-color:#DDBFB8;text-decoration-thickness:2px;">archive</span>.</h1>
+        <p style="font-size:18px;line-height:1.65;color:#41505E;margin:0 0 26px;max-width:54ch;">You are not assembling a scrapbook of everything you have ever taught. You are making a case: here is the kind of teacher I am, here is the evidence, and here is why my choices produced it.</p>
+
+        <div style="background:#FFFFFF;border:1px solid #E7E1D5;border-radius:14px;padding:22px 24px;margin-bottom:24px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+          <div style="font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7A0019;margin-bottom:14px;">The core of every section</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;gap:14px;align-items:baseline;"><span style="font-family:'Spectral',serif;font-weight:600;color:#990000;min-width:96px;font-size:17px;">Claim</span><span style="color:#41505E;font-size:15.5px;">I am an effective teacher.</span></div>
+            <div style="display:flex;gap:14px;align-items:baseline;"><span style="font-family:'Spectral',serif;font-weight:600;color:#990000;min-width:96px;font-size:17px;">Evidence</span><span style="color:#41505E;font-size:15.5px;">Here is what my students do, and how they rate the experience.</span></div>
+            <div style="display:flex;gap:14px;align-items:baseline;"><span style="font-family:'Spectral',serif;font-weight:600;color:#7A0019;min-width:96px;font-size:17px;">Reasoning</span><span style="color:#41505E;font-size:15.5px;">Because I make intentional, research-informed choices — the part committees almost never get, and the part that makes your case.</span></div>
+          </div>
+        </div>
+
+        <button onClick="{{ goTo1 }}" style="display:inline-flex;align-items:center;gap:10px;background:#990000;color:#fff;border:none;font-weight:700;font-size:16px;padding:15px 26px;border-radius:12px;cursor:pointer;box-shadow:0 4px 14px rgba(153,0,0,.28);" style-hover="background:#7A0019;">Start Activity 1 <span style="font-size:18px;">→</span></button>
+      </div>
+
+      <aside style="background:#2C2521;color:#F3E7E2;border-radius:16px;padding:26px 24px;position:sticky;top:140px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#D89AA0;margin-bottom:8px;">A working session · 45 min</div>
+        <p style="font-size:14.5px;line-height:1.6;color:#E0D2C8;margin:0 0 20px;">We move fast. Write rough — the goal is a usable skeleton you walk out with, not a polished document. Anything you don't finish, finish this week while it's fresh.</p>
+        <div style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#BFA39A;font-weight:600;margin-bottom:12px;">Today you'll build three things</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;gap:12px;"><span style="font-family:'IBM Plex Mono',monospace;color:#E3A7AC;">01</span><span style="font-size:14.5px;color:#F3E7E2;">A narrative core — one true sentence.</span></div>
+          <div style="display:flex;gap:12px;"><span style="font-family:'IBM Plex Mono',monospace;color:#E3A7AC;">02</span><span style="font-size:14.5px;color:#F3E7E2;">An evidence inventory mapped to your criteria.</span></div>
+          <div style="display:flex;gap:12px;"><span style="font-family:'IBM Plex Mono',monospace;color:#E3A7AC;">03</span><span style="font-size:14.5px;color:#F3E7E2;">A 90-day plan and an accountability partner.</span></div>
+        </div>
+        <hr style="border:none;border-top:1px solid #34465A;margin:22px 0;">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <label style="display:block;">
+            <span style="display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#D89AA0;margin-bottom:5px;">Your name</span>
+            <input value="{{ d.name }}" onChange="{{ onName }}" placeholder="Optional" style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid #3C4F63;background:#1F1A16;color:#fff;font-size:14px;" style-focus="border-color:#C75B66;outline:none;">
+          </label>
+          <label style="display:block;">
+            <span style="display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#D89AA0;margin-bottom:5px;">Today's course in focus</span>
+            <input value="{{ d.course }}" onChange="{{ onCourse }}" placeholder="e.g. CS2 · Data Structures" style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid #3C4F63;background:#1F1A16;color:#fff;font-size:14px;" style-focus="border-color:#C75B66;outline:none;">
+          </label>
+        </div>
+      </aside>
+    </div>
+
+    <!-- WARM-UP -->
+    <div style="margin-top:34px;border-top:1px solid #E4DECF;padding-top:30px;">
+      <div style="background:#fff;border:1px solid #E7E1D5;border-radius:16px;padding:26px 28px;box-shadow:0 1px 2px rgba(44,37,33,.04);border-left:4px solid #990000;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:6px;">
+          <div>
+            <div style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#7A0019;text-transform:uppercase;margin-bottom:10px;"><span style="background:#F3DAD5;border:1px solid #E6C9C2;border-radius:6px;padding:3px 8px;">Warm-up · 5 min</span><span style="color:#A98B5E;">Share around the room</span></div>
+            <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:28px;margin:0;letter-spacing:-.01em;">What guidance have you actually been given?</h2>
+          </div>
+        </div>
+        <p style="font-size:16px;line-height:1.6;color:#41505E;max-width:70ch;margin:14px 0 20px;">Most people find the promotion process opaque. Before we build anything, let's surface what each of us has — or hasn't — been told. From your chair, your unit, a mentor, or the official guidelines: <strong>what guidance have you received about building your teaching portfolio?</strong></p>
+
+        <textarea value="{{ d.warmupGuidance }}" onChange="{{ onWarmup }}" rows="3" placeholder="e.g. ‘Just keep your student evaluations.’ · A 2-page checklist from the dean. · Honestly, nothing — I'm figuring it out from peers." style="width:100%;font-family:'Hanken Grotesk',sans-serif;font-size:16px;line-height:1.55;padding:14px 16px;border:1px solid #E0D6C2;border-radius:11px;background:#FFFDF8;color:#2C2521;" style-focus="border-color:#990000;outline:none;box-shadow:0 0 0 3px rgba(153,0,0,.12);"></textarea>
+
+        <div style="margin-top:20px;">
+          <div style="font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;color:#7A0019;margin-bottom:10px;">How clear is the path at your institution?</div>
+          <div style="display:flex;gap:8px;">
+            <sc-for list="{{ clarityOptions }}" as="opt" hint-placeholder-count="5">
+              <button onClick="{{ opt.set }}" style="{{ opt.style }}">{{ opt.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-top:22px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+          <span style="font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;color:#7A0019;margin-right:2px;">Share as</span>
+          <button onClick="{{ setPostName }}" style="{{ postNameStyle }}">{{ postNameText }}</button>
+          <button onClick="{{ setPostAnon }}" style="{{ postAnonStyle }}">Anonymous</button>
+          <button onClick="{{ onPost }}" disabled="{{ postDisabled }}" style="{{ postBtnStyle }}">{{ postLabel }}</button>
+          <sc-if value="{{ posted }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goLiveWall }}" style="border:none;background:transparent;color:#990000;font-weight:600;font-size:14px;cursor:pointer;text-decoration:underline;">See the Live Wall →</button></sc-if>
+        </div>
+        <sc-if value="{{ postError }}" hint-placeholder-val="{{ false }}"><p style="margin:10px 0 0;font-size:13.5px;color:#7A0019;line-height:1.5;max-width:66ch;">{{ postError }}</p></sc-if>
+
+        <div style="margin-top:18px;border:1px dashed #DDBFB8;border-radius:12px;padding:16px 20px;background:#FAEEEA;">
+          <p style="margin:0;font-size:15px;color:#41505E;line-height:1.55;">When you share, your response joins the facilitator's <strong style="color:#990000;">Live Wall</strong> for the whole room to see. Listen for what's <strong style="color:#990000;">common</strong> — most people discover the guidance is thinner than they assumed, and that they're far from alone. That shared gap is exactly what the next 40 minutes will start to close.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ================= ACTIVITY 1 ================= -->
+  <sc-if value="{{ isTab1 }}" hint-placeholder-val="{{ false }}">
+  <section class="mtc-panel" data-screen-label="Activity 1 Narrative core" style="">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:8px;">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#7A0019;text-transform:uppercase;margin-bottom:10px;"><span style="background:#F3DAD5;border:1px solid #E6C9C2;border-radius:6px;padding:3px 8px;">Hands-on · 9 min</span><span style="color:#A98B5E;">Write silently, then a few read aloud</span></div>
+        <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0;letter-spacing:-.01em;">Activity 1 · Draft your narrative core</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:10px 12px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:500;letter-spacing:.02em;width:88px;text-align:center;color:{{ t1.color }};">{{ t1.display }}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <button onClick="{{ t1.toggle }}" style="border:none;background:#990000;color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;min-width:64px;">{{ t1.label }}</button>
+          <button onClick="{{ t1.reset }}" style="border:1px solid #E4DECF;background:transparent;color:#8A8472;font-size:11px;padding:5px 12px;border-radius:8px;cursor:pointer;">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:16.5px;line-height:1.6;color:#41505E;max-width:62ch;margin:18px 0 6px;">Fill the stem for the course you're focused on. Don't polish — we want a true rough draft you can build a teaching statement from later.</p>
+    <span style="display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2E7D54;background:#E6F1EA;border:1px solid #C8E2D2;border-radius:7px;padding:4px 10px;margin-bottom:22px;">permission to write rough</span>
+
+    <div style="background:#fff;border:1px solid #E7E1D5;border-radius:16px;padding:26px 28px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+      <div style="font-family:'Spectral',serif;font-size:21px;line-height:1.7;color:#2C2521;">
+        I am an effective teacher because I make intentional choices such as
+        <textarea value="{{ d.a1a }}" onChange="{{ onA1a }}" rows="2" placeholder="…pair programming in lab, specs grading, an autograder I built…" style="display:block;width:100%;margin:10px 0 16px;font-family:'Hanken Grotesk',sans-serif;font-size:16px;line-height:1.55;padding:13px 15px;border:1px solid #E0D6C2;border-radius:11px;background:#FFFDF8;color:#2C2521;" style-focus="border-color:#990000;outline:none;box-shadow:0 0 0 3px rgba(153,0,0,.12);"></textarea>
+        and as a result my students
+        <textarea value="{{ d.a1b }}" onChange="{{ onA1b }}" rows="2" placeholder="…pass the proof-heavy unit at a higher rate, submit working code earlier, persist into CS2…" style="display:block;width:100%;margin:10px 0 0;font-family:'Hanken Grotesk',sans-serif;font-size:16px;line-height:1.55;padding:13px 15px;border:1px solid #E0D6C2;border-radius:11px;background:#FFFDF8;color:#2C2521;" style-focus="border-color:#990000;outline:none;box-shadow:0 0 0 3px rgba(153,0,0,.12);"></textarea>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px;"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#A98B5E;">{{ a1Words }} words</span></div>
+    </div>
+
+    <!-- assembled preview -->
+    <sc-if value="{{ a1HasContent }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#F8E9E4;border:1px solid #E8CDC6;border-radius:14px;padding:20px 24px;margin-top:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A0019;margin-bottom:8px;">Your sentence so far</div>
+      <p style="font-family:'Spectral',serif;font-size:19px;line-height:1.6;margin:0;color:#2A2218;">{{ a1Sentence }}</p>
+    </div>
+    </sc-if>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px;">
+      <!-- traps -->
+      <div style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:20px 22px;">
+        <div style="font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#990000;margin-bottom:14px;">Two traps to avoid</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div><div style="font-weight:600;color:#2C2521;margin-bottom:3px;">Wishing, not evidencing.</div><div style="font-size:14.5px;color:#5B6B7A;line-height:1.55;">Write what you can show, not what you hope is true.</div></div>
+          <div><div style="font-weight:600;color:#2C2521;margin-bottom:3px;">Activities with no result.</div><div style="font-size:14.5px;color:#5B6B7A;line-height:1.55;">“I use pair programming” isn't an argument until you say what it changed.</div></div>
+        </div>
+      </div>
+      <!-- weakest part -->
+      <div style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:20px 22px;">
+        <div style="font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7A0019;margin-bottom:6px;">Find the weak part</div>
+        <p style="font-size:14px;color:#5B6B7A;line-height:1.5;margin:0 0 14px;">Underline the three parts in your own sentence. Which is thinnest right now? That's your next thing to develop.</p>
+        <div style="display:flex;gap:8px;">
+          <button onClick="{{ weakClaim }}" style="{{ weakClaimStyle }}">Claim</button>
+          <button onClick="{{ weakEvidence }}" style="{{ weakEvidenceStyle }}">Evidence</button>
+          <button onClick="{{ weakReasoning }}" style="{{ weakReasoningStyle }}">Reasoning</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI feedback -->
+    <div style="margin-top:24px;background:#F7EBE7;border:1px solid #E8D2CD;border-radius:16px;padding:22px 24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#7A0019;display:flex;align-items:center;gap:8px;"><span style="width:9px;height:9px;border-radius:50%;background:#990000;display:inline-block;"></span>Ask for feedback</div>
+          <div style="font-size:13.5px;color:#5B6B7A;margin-top:3px;">A coach reads your sentence for claim, evidence, and reasoning. Optional — your facilitator and partner are your best readers.</div>
+        </div>
+        <button onClick="{{ fb1.get }}" style="border:1px solid #990000;background:#990000;color:#fff;font-weight:600;font-size:14px;padding:11px 18px;border-radius:10px;cursor:pointer;white-space:nowrap;" style-hover="background:#7A0019;">Read my draft</button>
+      </div>
+      <sc-if value="{{ fb1.loading }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;margin-top:16px;color:#7A0019;font-size:14px;"><span style="width:16px;height:16px;border:2px solid #B9D4DE;border-top-color:#990000;border-radius:50%;display:inline-block;animation:mtcSpin .7s linear infinite;"></span>Reading your draft…</div>
+      </sc-if>
+      <sc-if value="{{ fb1.has }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:16px;background:#fff;border:1px solid #EDD9D4;border-radius:11px;padding:16px 18px;font-size:15px;line-height:1.6;color:#2C2521;white-space:pre-wrap;">{{ fb1.text }}</div>
+      </sc-if>
+    </div>
+
+    <!-- partner prompt -->
+    <div style="margin-top:18px;border:1px dashed #DDBFB8;border-radius:14px;padding:18px 22px;background:#FAEEEA;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A0019;margin-bottom:6px;">Surface · 2 min</div>
+      <p style="margin:0;font-size:15px;color:#41505E;line-height:1.55;">A few volunteers read aloud. As a group, locate the <strong style="color:#990000;">claim</strong>, the <strong style="color:#990000;">evidence</strong>, and the <strong style="color:#7A0019;">reasoning</strong> in each.</p>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ================= ACTIVITY 2 ================= -->
+  <sc-if value="{{ isTab2 }}" hint-placeholder-val="{{ false }}">
+  <section class="mtc-panel" data-screen-label="Activity 2 Evidence map" style="">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:8px;">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#7A0019;text-transform:uppercase;margin-bottom:10px;"><span style="background:#F3DAD5;border:1px solid #E6C9C2;border-radius:6px;padding:3px 8px;">Hands-on · 10 min</span><span style="color:#A98B5E;">6 min solo · 3 min with a partner</span></div>
+        <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0;letter-spacing:-.01em;">Activity 2 · Map evidence to your criteria</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:10px 12px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:500;width:88px;text-align:center;color:{{ t2.color }};">{{ t2.display }}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <button onClick="{{ t2.toggle }}" style="border:none;background:#990000;color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;min-width:64px;">{{ t2.label }}</button>
+          <button onClick="{{ t2.reset }}" style="border:1px solid #E4DECF;background:transparent;color:#8A8472;font-size:11px;padding:5px 12px;border-radius:8px;cursor:pointer;">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:16.5px;line-height:1.6;color:#41505E;max-width:64ch;margin:18px 0 22px;">Open your institution's promotion guidelines. The left column of your map uses <strong>their words, not mine</strong>. Use the evidence bank below to jog your memory, then map at least three items.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;">
+      <!-- mapping grid -->
+      <div>
+        <div style="background:#fff;border:1px solid #E7E1D5;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+          <div style="display:grid;grid-template-columns:1fr 1fr 116px 38px;gap:0;background:#F1ECE1;border-bottom:1px solid #E7E1D5;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;color:#6B7785;">
+            <div style="padding:11px 14px;">Evidence item</div>
+            <div style="padding:11px 14px;border-left:1px solid #E7E1D5;">Criterion it supports (their words)</div>
+            <div style="padding:11px 10px;border-left:1px solid #E7E1D5;text-align:center;">Status</div>
+            <div style="border-left:1px solid #E7E1D5;"></div>
+          </div>
+          <sc-for list="{{ rows }}" as="row" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:1fr 1fr 116px 38px;gap:0;border-bottom:1px solid #F0EBE0;">
+              <input value="{{ row.item }}" onChange="{{ row.onItem }}" placeholder="e.g. autograder I built for CS1" style="padding:13px 14px;border:none;background:transparent;font-size:14.5px;color:#2C2521;" style-focus="outline:none;background:#FFFDF8;">
+              <input value="{{ row.criterion }}" onChange="{{ row.onCriterion }}" placeholder="e.g. ‘curricular innovator’" style="padding:13px 14px;border:none;border-left:1px solid #F0EBE0;background:transparent;font-size:14.5px;color:#2C2521;" style-focus="outline:none;background:#FFFDF8;">
+              <button onClick="{{ row.toggle }}" style="{{ row.statusStyle }}">{{ row.statusLabel }}</button>
+              <button onClick="{{ row.remove }}" title="Remove row" style="border:none;border-left:1px solid #F0EBE0;background:transparent;color:#C4BCA9;font-size:18px;cursor:pointer;" style-hover="color:#990000;">×</button>
+            </div>
+          </sc-for>
+          <button onClick="{{ addRow }}" style="width:100%;padding:13px;border:none;background:#FBF1EC;color:#7A0019;font-weight:600;font-size:14px;cursor:pointer;" style-hover="background:#F3E4DF;">+ Add evidence row</button>
+        </div>
+
+        <!-- biggest gap -->
+        <div style="margin-top:20px;background:#2C2521;border-radius:16px;padding:22px 24px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#E3A7AC;margin-bottom:8px;">Biggest gap</div>
+          <div style="color:#E0D2C8;font-size:14.5px;margin-bottom:12px;">The single most important piece of evidence I do <strong style="color:#fff;">not</strong> yet have:</div>
+          <textarea value="{{ d.a2gap }}" onChange="{{ onA2gap }}" rows="2" placeholder="Name it. This becomes the first move in your 90-day plan." style="width:100%;font-family:'Hanken Grotesk',sans-serif;font-size:15px;line-height:1.55;padding:13px 15px;border:1px solid #3C4F63;border-radius:11px;background:#1F1A16;color:#fff;" style-focus="border-color:#C75B66;outline:none;"></textarea>
+        </div>
+
+        <!-- AI feedback evidence -->
+        <div style="margin-top:18px;background:#F7EBE7;border:1px solid #E8D2CD;border-radius:16px;padding:20px 22px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+            <div style="font-weight:700;font-size:15px;color:#7A0019;display:flex;align-items:center;gap:8px;"><span style="width:9px;height:9px;border-radius:50%;background:#990000;display:inline-block;"></span>Pressure-test my map</div>
+            <button onClick="{{ fb2.get }}" style="border:1px solid #990000;background:#990000;color:#fff;font-weight:600;font-size:14px;padding:10px 16px;border-radius:10px;cursor:pointer;white-space:nowrap;" style-hover="background:#7A0019;">Check my mapping</button>
+          </div>
+          <div style="font-size:13.5px;color:#5B6B7A;margin-top:4px;">Is each item mapped to a real criterion? What's the strongest piece — and what's missing?</div>
+          <sc-if value="{{ fb2.loading }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:10px;margin-top:14px;color:#7A0019;font-size:14px;"><span style="width:16px;height:16px;border:2px solid #B9D4DE;border-top-color:#990000;border-radius:50%;display:inline-block;animation:mtcSpin .7s linear infinite;"></span>Reading your map…</div>
+          </sc-if>
+          <sc-if value="{{ fb2.has }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:14px;background:#fff;border:1px solid #EDD9D4;border-radius:11px;padding:16px 18px;font-size:15px;line-height:1.6;color:#2C2521;white-space:pre-wrap;">{{ fb2.text }}</div>
+          </sc-if>
+        </div>
+
+        <!-- partner -->
+        <div style="margin-top:18px;border:1px dashed #DDBFB8;border-radius:14px;padding:18px 22px;background:#FAEEEA;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A0019;margin-bottom:8px;">Partner prompt · 3 min</div>
+          <p style="margin:0 0 6px;font-size:15px;color:#41505E;line-height:1.55;">Trade workbooks. Ask each other:</p>
+          <ol style="margin:0;padding-left:20px;color:#41505E;font-size:15px;line-height:1.7;">
+            <li>What is the single strongest piece of evidence here?</li>
+            <li>What is obviously missing? Partners often spot strengths you've stopped noticing.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- side: rank ladder + evidence bank -->
+      <aside style="display:flex;flex-direction:column;gap:16px;position:sticky;top:140px;">
+        <div style="background:#F3E7E2;border:1px solid #E8D2CD;border-radius:14px;padding:18px 18px;">
+          <div style="font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#7A0019;margin-bottom:10px;">Know the bar you're reaching for</div>
+          <div style="font-size:13.5px;line-height:1.55;color:#2C2521;display:flex;flex-direction:column;gap:11px;">
+            <div><strong>Asst → Assoc Teaching Prof:</strong> strong in the classroom, a curricular innovator, a positive TA mentor, clear potential for educational leadership.</div>
+            <div><strong>Assoc → Teaching Prof:</strong> sustained excellence, leadership through novel methods and new courses, scholarship with national visibility, mentoring junior faculty.</div>
+            <div style="color:#5B6B7A;font-style:italic;">Map your evidence to the rank you're reaching toward — in your own guidelines' words. (UW Allen School example.)</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:8px 6px;">
+          <div style="font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#6B7785;padding:10px 12px 6px;">CS evidence bank</div>
+          <details style="border-top:1px solid #F0EBE0;"><summary style="cursor:pointer;padding:11px 12px;font-weight:600;font-size:14px;color:#990000;">Teaching statement</summary><div style="padding:0 12px 13px;font-size:13.5px;color:#5B6B7A;line-height:1.55;">How people learn to program; closing the novice-to-expert gap; broadening participation in computing.</div></details>
+          <details style="border-top:1px solid #F0EBE0;"><summary style="cursor:pointer;padding:11px 12px;font-weight:600;font-size:14px;color:#990000;">Course descriptions</summary><div style="padding:0 12px 13px;font-size:13.5px;color:#5B6B7A;line-height:1.55;">Level (CS1, systems, theory), size, modality, your actual role, and innovations: pair programming, peer instruction, POGIL, specs grading, Parsons problems.</div></details>
+          <details style="border-top:1px solid #F0EBE0;"><summary style="cursor:pointer;padding:11px 12px;font-weight:600;font-size:14px;color:#990000;">Course materials</summary><div style="padding:0 12px 13px;font-size:13.5px;color:#5B6B7A;line-height:1.55;">Annotated syllabus, a signature project, an autograder or test suite you built, a rubric, anonymized student work with permission.</div></details>
+          <details style="border-top:1px solid #F0EBE0;"><summary style="cursor:pointer;padding:11px 12px;font-weight:600;font-size:14px;color:#990000;">Ratings (quant + qual)</summary><div style="padding:0 12px 13px;font-size:13.5px;color:#5B6B7A;line-height:1.55;">5–7 items trended over 4+ semesters by course type, with context. Comments grouped into 4–5 themes including one honest growth area.</div></details>
+          <details style="border-top:1px solid #F0EBE0;"><summary style="cursor:pointer;padding:11px 12px;font-weight:600;font-size:14px;color:#990000;">Learning outcomes</summary><div style="padding:0 12px 13px;font-size:13.5px;color:#5B6B7A;line-height:1.55;">Concept-inventory gains (e.g. SCS1), pass and DFW rates, equity-gap movement, retention into the next course, project portfolios.</div></details>
+          <details style="border-top:1px solid #F0EBE0;"><summary style="cursor:pointer;padding:11px 12px;font-weight:600;font-size:14px;color:#990000;">Peer &amp; professional</summary><div style="padding:0 12px 13px;font-size:13.5px;color:#5B6B7A;line-height:1.55;">Peer observations, TA/UTA training and supervision, curriculum work, OER, SIGCSE / ITiCSE / ICER papers, pedagogical grants, awards.</div></details>
+          <details style="border-top:1px solid #F0EBE0;"><summary style="cursor:pointer;padding:11px 12px;font-weight:600;font-size:14px;color:#990000;">Service &amp; leadership</summary><div style="padding:0 12px 13px;font-size:13.5px;color:#5B6B7A;line-height:1.55;">Curriculum committee, ABET/accreditation work, outreach and broadening-participation programs, coordinating a multi-section course.</div></details>
+        </div>
+      </aside>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ================= ACTIVITY 3 ================= -->
+  <sc-if value="{{ isTab3 }}" hint-placeholder-val="{{ false }}">
+  <section class="mtc-panel" data-screen-label="Activity 3 90-day plan" style="">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:8px;">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#7A0019;text-transform:uppercase;margin-bottom:10px;"><span style="background:#F3DAD5;border:1px solid #E6C9C2;border-radius:6px;padding:3px 8px;">Hands-on · 4 min</span><span style="color:#A98B5E;">3 min solo · then swap with a partner</span></div>
+        <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0;letter-spacing:-.01em;">Activity 3 · Your 90-day action plan</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:10px 12px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:500;width:88px;text-align:center;color:{{ t3.color }};">{{ t3.display }}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <button onClick="{{ t3.toggle }}" style="border:none;background:#990000;color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;min-width:64px;">{{ t3.label }}</button>
+          <button onClick="{{ t3.reset }}" style="border:1px solid #E4DECF;background:transparent;color:#8A8472;font-size:11px;padding:5px 12px;border-radius:8px;cursor:pointer;">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:16.5px;line-height:1.6;color:#41505E;max-width:62ch;margin:18px 0 18px;">Three concrete, small moves for the next 90 days. <strong>Specific beats ambitious.</strong> “Start the archive folder this week” beats “write my teaching statement.”</p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;align-items:center;">
+      <span style="font-size:12.5px;color:#8A8472;font-weight:600;letter-spacing:.03em;">Ideas to steal:</span>
+      <sc-for list="{{ ideas }}" as="idea" hint-placeholder-count="6">
+        <button onClick="{{ idea.use }}" style="border:1px solid #DDBFB8;background:#FAEEEA;color:#7A0019;font-size:13px;padding:7px 13px;border-radius:99px;cursor:pointer;" style-hover="background:#F3E1DC;border-color:#C99A93;">{{ idea.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:26px;">
+      <div style="display:flex;gap:14px;align-items:center;background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <span style="font-family:'Spectral',serif;font-weight:600;font-size:24px;color:#990000;width:30px;text-align:center;flex:none;">1</span>
+        <input value="{{ d.move1 }}" onChange="{{ onMove1 }}" placeholder="The move…" style="flex:1;min-width:0;padding:12px 14px;border:1px solid #E0D6C2;border-radius:10px;background:#FFFDF8;font-size:15px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+        <input value="{{ d.by1 }}" onChange="{{ onBy1 }}" placeholder="By when" style="width:150px;flex:none;padding:12px 14px;border:1px solid #E0D6C2;border-radius:10px;background:#FFFDF8;font-size:15px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <span style="font-family:'Spectral',serif;font-weight:600;font-size:24px;color:#990000;width:30px;text-align:center;flex:none;">2</span>
+        <input value="{{ d.move2 }}" onChange="{{ onMove2 }}" placeholder="The move…" style="flex:1;min-width:0;padding:12px 14px;border:1px solid #E0D6C2;border-radius:10px;background:#FFFDF8;font-size:15px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+        <input value="{{ d.by2 }}" onChange="{{ onBy2 }}" placeholder="By when" style="width:150px;flex:none;padding:12px 14px;border:1px solid #E0D6C2;border-radius:10px;background:#FFFDF8;font-size:15px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <span style="font-family:'Spectral',serif;font-weight:600;font-size:24px;color:#990000;width:30px;text-align:center;flex:none;">3</span>
+        <input value="{{ d.move3 }}" onChange="{{ onMove3 }}" placeholder="The move…" style="flex:1;min-width:0;padding:12px 14px;border:1px solid #E0D6C2;border-radius:10px;background:#FFFDF8;font-size:15px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+        <input value="{{ d.by3 }}" onChange="{{ onBy3 }}" placeholder="By when" style="width:150px;flex:none;padding:12px 14px;border:1px solid #E0D6C2;border-radius:10px;background:#FFFDF8;font-size:15px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+      <!-- mentors -->
+      <div style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:20px 22px;">
+        <div style="font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7A0019;margin-bottom:6px;">Seek out mentors</div>
+        <p style="font-size:13.5px;color:#5B6B7A;line-height:1.5;margin:0 0 14px;">No one should do this on an island. Line up more than one — a recently promoted peer, and a senior mentor who has sat on review committees.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <input value="{{ d.mentor1 }}" onChange="{{ onMentor1 }}" placeholder="Mentor 1 — who, and their angle" style="width:100%;padding:11px 13px;border:1px solid #E0D6C2;border-radius:10px;background:#FFFDF8;font-size:14.5px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+          <input value="{{ d.mentor2 }}" onChange="{{ onMentor2 }}" placeholder="Mentor 2 — who, and their angle" style="width:100%;padding:11px 13px;border:1px solid #E0D6C2;border-radius:10px;background:#FFFDF8;font-size:14.5px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+        </div>
+      </div>
+      <!-- accountability -->
+      <div style="background:#F8E9E4;border:1px solid #E8CDC6;border-radius:14px;padding:20px 22px;">
+        <div style="font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7A0019;margin-bottom:6px;">Accountability partner</div>
+        <p style="font-size:13.5px;color:#7A0019;line-height:1.5;margin:0 0 14px;">Swap one commitment and contact info with someone in the room before you leave.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;gap:10px;">
+            <input value="{{ d.apName }}" onChange="{{ onApName }}" placeholder="Partner name" style="flex:1;min-width:0;padding:11px 13px;border:1px solid #E0D6C2;border-radius:10px;background:#fff;font-size:14.5px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+            <input value="{{ d.apContact }}" onChange="{{ onApContact }}" placeholder="Contact" style="flex:1;min-width:0;padding:11px 13px;border:1px solid #E0D6C2;border-radius:10px;background:#fff;font-size:14.5px;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+          </div>
+          <textarea value="{{ d.apCommit }}" onChange="{{ onApCommit }}" rows="2" placeholder="The one commitment I'm sharing with them…" style="width:100%;font-family:'Hanken Grotesk',sans-serif;padding:11px 13px;border:1px solid #E0D6C2;border-radius:10px;background:#fff;font-size:14.5px;line-height:1.5;color:#2C2521;" style-focus="border-color:#990000;outline:none;"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;display:flex;justify-content:flex-end;">
+      <button onClick="{{ goTo7 }}" style="display:inline-flex;align-items:center;gap:10px;background:#2C2521;color:#fff;border:none;font-weight:700;font-size:16px;padding:15px 26px;border-radius:12px;cursor:pointer;" style-hover="background:#1F1A16;">See your portfolio skeleton <span style="font-size:18px;">→</span></button>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ================= HARD PARTS ================= -->
+  <sc-if value="{{ isTab4 }}" hint-placeholder-val="{{ false }}">
+  <section class="mtc-panel" data-screen-label="Hard parts" style="">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:#7A0019;text-transform:uppercase;margin-bottom:10px;">Reference · keep this page</div>
+    <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0 0 8px;letter-spacing:-.01em;">The questions you actually get stuck on</h2>
+    <p style="font-size:16px;color:#5B6B7A;max-width:66ch;line-height:1.6;margin:0 0 26px;">Four sticking points for teaching-track CS faculty. The examples are illustrative — written in first person to show the move, not real data.</p>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <details open style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:6px 22px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <summary style="cursor:pointer;font-family:'Spectral',serif;font-weight:600;font-size:20px;padding:14px 0;color:#2C2521;">1 · Student ratings are biased and still weigh heavily</summary>
+        <div style="padding:0 0 18px;color:#41505E;font-size:15px;line-height:1.65;">
+          <p style="margin:0 0 10px;">Ratings correlate with instructor gender, race, and accent, and with course difficulty and required-vs-elective status — somewhat apart from teaching quality. <strong>Never lead with a raw average.</strong> Show context and the trend; pair it with evidence that doesn't depend on perception: concept-inventory gains, DFW rates, artifacts, peer observation. For comments: 4–5 themes, one honest growth area, 2–3 quotes each.</p>
+          <div style="background:#F7EBE7;border-left:3px solid #990000;border-radius:0 8px 8px 0;padding:13px 16px;margin-top:12px;font-size:14.5px;color:#2C2521;"><strong>Example.</strong> My CS2 ratings averaged 3.9 against a 4.3 department average. Instead of burying it, I noted CS2 is a required, proof-heavy course in a historically low band, showed scores climbing 3.5 → 3.9 → 4.1 over three years, and set them beside a concept-inventory gain and a peer-observation letter. The argument lands: students find this hard, and they're learning more in it than before.</div>
+          <div style="margin-top:14px;font-size:13.5px;color:#5B6B7A;"><strong>Gather better evidence than end-of-term ratings:</strong> early-term feedback (weeks 3–5), a midterm minute paper, a Small Group Instructional Diagnosis (SGID), and peer/consultant observation. Match the instrument to how you teach (lecture, project, lab, distance).</div>
+        </div>
+      </details>
+
+      <details style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:6px 22px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <summary style="cursor:pointer;font-family:'Spectral',serif;font-weight:600;font-size:20px;padding:14px 0;color:#2C2521;">2 · Showing your teaching at scale</summary>
+        <div style="padding:0 0 18px;color:#41505E;font-size:15px;line-height:1.65;">
+          <p style="margin:0 0 10px;">Large courses hide individual teaching. <strong>Make the systems the evidence:</strong> the autograder, the TA training you run, the scalable feedback or mastery scheme, the rubrics that keep many sections consistent. Scalable outcomes: pass/DFW rates, equity-gap movement, retention into the next course.</p>
+          <div style="background:#F7EBE7;border-left:3px solid #990000;border-radius:0 8px 8px 0;padding:13px 16px;margin-top:12px;font-size:14.5px;color:#2C2521;"><strong>Example.</strong> I coordinate a 320-student CS1 across six sections and nine TAs. Rather than claim one-on-one attention I can't document, I show the autograder I built, the weekly TA calibration and shared rubric, and a DFW rate that fell from 28% to 17% after I added resubmission. The system is the teaching — and that's the evidence.</div>
+        </div>
+      </details>
+
+      <details style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:6px 22px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <summary style="cursor:pointer;font-family:'Spectral',serif;font-weight:600;font-size:20px;padding:14px 0;color:#2C2521;">3 · Team-taught and coordinated courses</summary>
+        <div style="padding:0 0 18px;color:#41505E;font-size:15px;line-height:1.65;">
+          <p style="margin:0 0 10px;"><strong>State your specific contribution plainly</strong> and back it with a co-instructor or course-coordinator letter. Committees cannot infer what you did.</p>
+          <div style="background:#F7EBE7;border-left:3px solid #990000;border-radius:0 8px 8px 0;padding:13px 16px;margin-top:12px;font-size:14.5px;color:#2C2521;"><strong>Example.</strong> Our software engineering course is team-taught with two colleagues. My portfolio says plainly: I designed and taught the testing and CI/CD modules in weeks 6–9, built the autograded project pipeline, and wrote the rubric the whole team now uses. A letter from the coordinator confirms it, so no one has to guess which parts were mine.</div>
+        </div>
+      </details>
+
+      <details style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:6px 22px;box-shadow:0 1px 2px rgba(30,42,56,.04);">
+        <summary style="cursor:pointer;font-family:'Spectral',serif;font-weight:600;font-size:20px;padding:14px 0;color:#2C2521;">4 · Does CS education work count as scholarship?</summary>
+        <div style="padding:0 0 18px;color:#41505E;font-size:15px;line-height:1.65;">
+          <p style="margin:0 0 10px;">Often yes — or it strengthens the case under teaching. <strong>Name it:</strong> SIGCSE / ITiCSE / ICER papers and posters, published assignment sets or OER, a tool others adopt, curriculum redesign, pedagogical grants. Map each item to the exact category your guidelines use (teaching, scholarship, or service). Teaching-track scholarship usually weighs toward Boyer's <em>Integration</em> and <em>Application</em>, with some <em>Discovery</em>.</p>
+          <div style="background:#F7EBE7;border-left:3px solid #990000;border-radius:0 8px 8px 0;padding:13px 16px;margin-top:12px;font-size:14.5px;color:#2C2521;"><strong>Example.</strong> I rebuilt data structures around peer instruction and wrote it up as an experience report accepted at SIGCSE. I list it under scholarship with the full citation, note the released question bank as an OER, and name the internal teaching-innovation grant that funded the redesign. Same work, filed in the category my guidelines actually recognize.</div>
+        </div>
+      </details>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ================= TAKE-HOME ================= -->
+  <sc-if value="{{ isTab5 }}" hint-placeholder-val="{{ false }}">
+  <section class="mtc-panel" data-screen-label="Take-home" style="">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:#7A0019;text-transform:uppercase;margin-bottom:10px;">Take-home</div>
+    <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0 0 8px;letter-spacing:-.01em;">Portfolio component checklist</h2>
+    <p style="font-size:16px;color:#5B6B7A;max-width:64ch;line-height:1.6;margin:0 0 8px;">Use this when you build the full document — a curated highlights version backed by a private archive of everything. Tick items as you gather them; your progress saves automatically.</p>
+    <div style="display:flex;align-items:center;gap:12px;margin:14px 0 22px;">
+      <div style="flex:1;max-width:340px;height:8px;border-radius:99px;background:#E6E0D2;overflow:hidden;"><div style="height:100%;background:#990000;border-radius:99px;transition:width .4s ease;width:{{ checklistPct }}%;"></div></div>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#7A0019;">{{ checklistPct }}% gathered</span>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:34px;">
+      <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="12">
+        <label style="display:flex;gap:13px;align-items:flex-start;background:#fff;border:1px solid #E7E1D5;border-radius:11px;padding:13px 16px;cursor:pointer;" style-hover="border-color:#E8D2CD;">
+          <input type="checkbox" checked="{{ c.checked }}" onChange="{{ c.toggle }}" style="margin-top:3px;width:17px;height:17px;accent-color:#990000;flex:none;cursor:pointer;">
+          <span style="font-size:15px;line-height:1.5;color:#2C2521;">{{ c.label }}</span>
+        </label>
+      </sc-for>
+    </div>
+
+    <h3 style="font-family:'Spectral',serif;font-weight:600;font-size:26px;margin:0 0 6px;">Ten strategies for the annual dossier</h3>
+    <p style="font-size:14.5px;color:#5B6B7A;margin:0 0 18px;">Condensed from Burnham, Hooper &amp; Wright. These reinforce the archive habit and the 90-day plan.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;">
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">01</span>Begin on day one. Start an evidence file now; keep everything early, cut later.</div>
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">02</span>Read your college and university guidelines carefully.</div>
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">03</span>Listen to senior faculty; they often sit on the review committees.</div>
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">04</span>Follow the rules for what to include and what to leave out.</div>
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">05</span>Work consistently through the year, not in a last-minute rush.</div>
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">06</span>Seek multiple mentors, including recently promoted peers.</div>
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">07</span>Be transparent. Don't hide weak spots or embellish; both get noticed.</div>
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">08</span>Keep it consistent and accurate; your CV and dossier must align.</div>
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">09</span>Address the reviewers' prior recommendations explicitly in your narrative.</div>
+      <div style="display:flex;gap:12px;font-size:14.5px;color:#2C2521;line-height:1.5;"><span style="font-family:'IBM Plex Mono',monospace;color:#7A0019;flex:none;">10</span>Consult at every stage: before, during, and after.</div>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ================= RESOURCES ================= -->
+  <sc-if value="{{ isTab6 }}" hint-placeholder-val="{{ false }}">
+  <section class="mtc-panel" data-screen-label="Resources" style="">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:#7A0019;text-transform:uppercase;margin-bottom:10px;">Teaching &amp; career resources</div>
+    <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0 0 12px;letter-spacing:-.01em;">For early-career computer science faculty</h2>
+    <p style="font-size:16px;color:#41505E;max-width:74ch;line-height:1.6;margin:0 0 10px;">A companion to the workshop. Each institution leads with its <strong>teaching-portfolio help</strong> — programs, guides, and consultations — then its broader teaching center and new-faculty support. <strong>Start with your own center</strong>, then use the national CS-specific resources at the end.</p>
+    <p style="font-size:13.5px;color:#8A8472;font-style:italic;max-width:74ch;line-height:1.55;margin:0 0 8px;">Links were verified at the time of writing; if one has moved, search the center name plus your campus.</p>
+
+    <!-- INSTITUTIONS -->
+    <div style="display:flex;flex-direction:column;gap:16px;margin:28px 0 40px;">
+      <sc-for list="{{ institutions }}" as="inst" hint-placeholder-count="8">
+        <div style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:22px 26px;box-shadow:0 1px 2px rgba(44,37,33,.04);border-left:4px solid {{ inst.accent }};">
+          <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+            <h3 style="font-family:'Spectral',serif;font-weight:600;font-size:22px;margin:0;color:#2C2521;">{{ inst.name }}</h3>
+            <sc-if value="{{ inst.home }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#990000;border-radius:5px;padding:3px 8px;">Your campus</span></sc-if>
+          </div>
+          <div style="font-size:14.5px;color:#41505E;margin-bottom:14px;">{{ inst.center }} · <a href="{{ inst.url }}" target="_blank" rel="noopener" style="color:#990000;font-weight:600;text-decoration:none;border-bottom:1px solid rgba(153,0,0,.3);">Center home ↗</a></div>
+          <ul style="margin:0 0 16px;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;">
+            <sc-for list="{{ inst.bullets }}" as="b" hint-placeholder-count="3">
+              <li style="display:flex;gap:11px;font-size:14.5px;line-height:1.55;color:#41505E;"><span style="color:#990000;flex:none;font-weight:700;line-height:1.45;">·</span><span><strong style="color:#2C2521;">{{ b.lead }}</strong>{{ b.text }}</span></li>
+            </sc-for>
+          </ul>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid #F0EBE0;padding-top:14px;">
+            <span style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:#8A8472;margin-right:2px;">Key pages</span>
+            <sc-for list="{{ inst.keyPages }}" as="kp" hint-placeholder-count="3">
+              <a href="{{ kp.url }}" target="_blank" rel="noopener" style="font-size:13px;color:#990000;background:#F8E9E4;border:1px solid #E8CDC6;border-radius:99px;padding:6px 13px;text-decoration:none;font-weight:600;" style-hover="background:#F3DAD5;">{{ kp.label }} ↗</a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- CS-SPECIFIC -->
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
+      <h3 style="font-family:'Spectral',serif;font-weight:600;font-size:27px;margin:0;color:#2C2521;">CS-specific resources</h3>
+      <span style="font-size:13.5px;color:#8A8472;">useful at every institution</span>
+    </div>
+    <p style="font-size:15px;color:#5B6B7A;max-width:70ch;line-height:1.6;margin:0 0 22px;">Computing-education resources that apply regardless of campus. They pair well with whatever your local teaching center offers.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px;">
+      <sc-for list="{{ csGroups }}" as="g" hint-placeholder-count="3">
+        <div style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:20px 22px;">
+          <div style="font-weight:700;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:#7A0019;margin-bottom:14px;">{{ g.heading }}</div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:15px;">
+            <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+              <li style="font-size:14px;line-height:1.55;color:#41505E;">{{ it.text }} <a href="{{ it.url }}" target="_blank" rel="noopener" style="color:#990000;font-weight:600;text-decoration:none;border-bottom:1px solid rgba(153,0,0,.3);">{{ it.label }} ↗</a></li>
+            </sc-for>
+          </ul>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- DEPARTMENT THIS WEEK -->
+    <div style="background:#2C2521;border-radius:16px;padding:30px 34px;color:#F3E7E2;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#E3A7AC;margin-bottom:8px;">In your own department, this week</div>
+      <p style="font-size:16px;line-height:1.6;color:#E0D2C8;max-width:66ch;margin:0 0 20px;">No center replaces what lives inside your unit. Wherever you are, do these four things early.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 28px;">
+        <sc-for list="{{ deptItems }}" as="item" hint-placeholder-count="4">
+          <div style="display:flex;gap:13px;align-items:baseline;"><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:500;color:#E3A7AC;flex:none;">{{ item.n }}</span><span style="font-size:14.5px;line-height:1.55;color:#F3E7E2;">{{ item.text }}</span></div>
+        </sc-for>
+      </div>
+    </div>
+
+    <p style="font-size:13.5px;color:#8A8472;font-style:italic;max-width:74ch;line-height:1.55;margin:22px 0 0;border-top:1px solid #E4DECF;padding-top:18px;">Most of these centers are POD Network members and CIRTL-affiliated, so programs and language transfer well if you move between campuses.</p>
+  </section>
+  </sc-if>
+
+  <!-- ================= LIVE WALL ================= -->
+  <sc-if value="{{ isTab8 }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Live Wall" style="">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:18px;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:#7A0019;text-transform:uppercase;margin-bottom:10px;">Facilitator · project this screen</div>
+        <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0;letter-spacing:-.01em;">Live Wall · what the room has been told</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;padding:9px 14px;border-radius:99px;">
+        <sc-if value="{{ live.configured }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:8px;background:#E6F1EA;border:1px solid #C8E2D2;color:#2E7D54;padding:9px 14px;border-radius:99px;"><span style="width:8px;height:8px;border-radius:50%;background:#2E7D54;display:inline-block;"></span>Live · connected</span></sc-if>
+        <sc-if value="{{ live.connecting }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:8px;background:#F3E7E2;border:1px solid #E8CDC6;color:#7A0019;padding:9px 14px;border-radius:99px;"><span style="width:14px;height:14px;border:2px solid #E0B9B0;border-top-color:#990000;border-radius:50%;display:inline-block;animation:mtcSpin .7s linear infinite;"></span>Connecting…</span></sc-if>
+        <sc-if value="{{ live.unconfigured }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:8px;background:#F3EBD9;border:1px solid #E4DECF;color:#8A8472;padding:9px 14px;border-radius:99px;">Not set up yet</span></sc-if>
+        <sc-if value="{{ live.error }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:8px;background:#FAE7E4;border:1px solid #E8C9C4;color:#B23A2A;padding:9px 14px;border-radius:99px;">Connection error</span></sc-if>
+      </div>
+    </div>
+
+    <!-- CONFIGURED -->
+    <sc-if value="{{ live.configured }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:240px 1fr;gap:18px;align-items:start;">
+        <!-- left rail: count + session + tally -->
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:140px;">
+          <div style="background:#2C2521;border-radius:16px;padding:24px;color:#F3E7E2;text-align:center;">
+            <div style="font-family:'Spectral',serif;font-weight:700;font-size:54px;line-height:1;color:#fff;">{{ live.count }}</div>
+            <div style="font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#D89AA0;margin-top:6px;">responses shared</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:16px 18px;">
+            <div style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:#8A8472;margin-bottom:8px;">Clarity of the path</div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <sc-for list="{{ live.tally }}" as="t" hint-placeholder-count="5">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#41505E;margin-bottom:3px;"><span>{{ t.label }}</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A8472;">{{ t.count }}</span></div>
+                  <div style="height:8px;border-radius:99px;background:#EFE9DC;overflow:hidden;"><div style="height:100%;border-radius:99px;transition:width .4s ease;width:{{ t.pct }}%;background:{{ t.color }};"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:16px 18px;">
+            <div style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:#8A8472;margin-bottom:8px;">Session code</div>
+            <input value="{{ live.session }}" onChange="{{ live.onSession }}" style="width:100%;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:9px 11px;border:1px solid #E0D6C2;border-radius:9px;background:#FFFDF8;color:#2C2521;" style-focus="border-color:#990000;outline:none;">
+            <p style="font-size:12px;color:#8A8472;line-height:1.45;margin:9px 0 0;">Everyone on this code shares one wall. Change it to start a fresh, empty session.</p>
+          </div>
+        </div>
+
+        <!-- response cards -->
+        <div>
+          <sc-if value="{{ live.hasAny }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;">
+              <sc-for list="{{ live.cards }}" as="c" hint-placeholder-count="4">
+                <div style="background:#fff;border:1px solid #E7E1D5;border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(44,37,33,.04);border-top:3px solid {{ c.color }};animation:mtcFadeUp .4s ease both;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+                    <span style="font-weight:700;font-size:14px;color:#2C2521;">{{ c.name }}</span>
+                    <sc-if value="{{ c.hasClarity }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px;font-weight:600;color:#fff;background:{{ c.color }};border-radius:99px;padding:3px 10px;">{{ c.clarity }}</span></sc-if>
+                  </div>
+                  <sc-if value="{{ c.hasText }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:15px;line-height:1.55;color:#41505E;">{{ c.text }}</p></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ live.empty }}" hint-placeholder-val="{{ false }}">
+            <div style="border:2px dashed #E4DECF;border-radius:16px;padding:60px 30px;text-align:center;color:#A89F8C;">
+              <div style="font-family:'Spectral',serif;font-size:22px;color:#8A8472;margin-bottom:8px;">Waiting for the first response…</div>
+              <p style="font-size:15px;margin:0;max-width:46ch;margin-left:auto;margin-right:auto;line-height:1.55;">Ask the room to open the Welcome page, answer the warm-up, and tap <strong style="color:#990000;">Share with the room</strong>. Responses appear here instantly.</p>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- NOT CONFIGURED / ERROR → setup walkthrough -->
+    <sc-if value="{{ live.unconfigured }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #E7E1D5;border-radius:16px;padding:30px 34px;box-shadow:0 1px 2px rgba(44,37,33,.04);">
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
+          <h3 style="font-family:'Spectral',serif;font-weight:600;font-size:24px;margin:0;color:#2C2521;">Turn on the Live Wall — one-time setup (~10 min, free)</h3>
+        </div>
+        <p style="font-size:15px;color:#5B6B7A;line-height:1.6;max-width:74ch;margin:0 0 22px;">The Live Wall uses Google Firebase (free Spark plan). You set up a project once, paste six values into this file, and host it. Until then, the warm-up still saves on each person's own device.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:16px;align-items:flex-start;"><span style="font-family:'Spectral',serif;font-weight:700;font-size:20px;color:#990000;flex:none;width:28px;">1</span><div style="font-size:15px;line-height:1.6;color:#41505E;">Go to <strong>console.firebase.google.com</strong> and create a project (any name; you can disable Analytics). The free <strong>Spark</strong> plan is plenty.</div></div>
+          <div style="display:flex;gap:16px;align-items:flex-start;"><span style="font-family:'Spectral',serif;font-weight:700;font-size:20px;color:#990000;flex:none;width:28px;">2</span><div style="font-size:15px;line-height:1.6;color:#41505E;">In the project, click the <strong>Web</strong> icon (<code style="background:#F3EBD9;padding:1px 6px;border-radius:5px;">&lt;/&gt;</code>) to register a web app. Copy the <code style="background:#F3EBD9;padding:1px 6px;border-radius:5px;">firebaseConfig</code> object it shows you.</div></div>
+          <div style="display:flex;gap:16px;align-items:flex-start;"><span style="font-family:'Spectral',serif;font-weight:700;font-size:20px;color:#990000;flex:none;width:28px;">3</span><div style="font-size:15px;line-height:1.6;color:#41505E;">Open this HTML file in a text editor, find the <strong>LIVE WARM-UP · Firebase setup</strong> block near the top, and paste your six values (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId) between the quotes.</div></div>
+          <div style="display:flex;gap:16px;align-items:flex-start;"><span style="font-family:'Spectral',serif;font-weight:700;font-size:20px;color:#990000;flex:none;width:28px;">4</span><div style="font-size:15px;line-height:1.6;color:#41505E;">In the console, open <strong>Build → Firestore Database → Create database</strong>. Choose <strong>Start in test mode</strong> (fine for a workshop), then enable it.</div></div>
+          <div style="display:flex;gap:16px;align-items:flex-start;"><span style="font-family:'Spectral',serif;font-weight:700;font-size:20px;color:#990000;flex:none;width:28px;">5</span><div style="font-size:15px;line-height:1.6;color:#41505E;">Host the file (GitHub Pages, Netlify, or Vercel) and open it. This badge turns <strong style="color:#2E7D54;">green</strong> — project this tab and you're live.</div></div>
+        </div>
+        <div style="margin-top:22px;background:#F8E9E4;border:1px solid #E8CDC6;border-radius:12px;padding:16px 20px;">
+          <div style="font-weight:700;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:#7A0019;margin-bottom:8px;">A note on security rules</div>
+          <p style="font-size:14px;color:#41505E;line-height:1.55;margin:0;">Test mode opens read/write for 30 days — perfect for an event. For a longer-lived deployment, restrict rules to the <code style="background:#fff;padding:1px 6px;border-radius:5px;">mtc-sessions</code> collection, or add light auth. Happy to generate a tighter rule set when you're ready.</p>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ live.error }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#FAE7E4;border:1px solid #E8C9C4;border-radius:14px;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-weight:700;font-size:15px;color:#B23A2A;margin-bottom:6px;">Live connection error</div>
+        <p style="font-size:14.5px;color:#41505E;line-height:1.55;margin:0 0 6px;">{{ live.errorMsg }}</p>
+        <p style="font-size:13.5px;color:#8A8472;line-height:1.5;margin:0;">Most often: Firestore isn't enabled yet, or the security rules block writes. Re-check steps 3–4 above, then reload.</p>
+      </div>
+    </sc-if>
+  </section>
+  </sc-if>
+
+  <!-- ================= SKELETON / FINISH ================= -->
+  <sc-if value="{{ isTab7 }}" hint-placeholder-val="{{ false }}">
+  <section class="mtc-panel" data-screen-label="Your skeleton" style="position:relative;">
+    <sc-if value="{{ doneAll }}" hint-placeholder-val="{{ false }}">
+      <div data-noprint="1" style="position:absolute;top:-10px;left:0;right:0;height:120px;pointer-events:none;overflow:hidden;">
+        <span style="position:absolute;left:12%;width:9px;height:9px;background:#990000;animation:mtcFloat 2.6s ease-out .0s infinite;"></span>
+        <span style="position:absolute;left:28%;width:8px;height:8px;background:#990000;animation:mtcFloat 2.9s ease-out .3s infinite;"></span>
+        <span style="position:absolute;left:46%;width:10px;height:10px;background:#E3A7AC;animation:mtcFloat 2.4s ease-out .15s infinite;"></span>
+        <span style="position:absolute;left:64%;width:8px;height:8px;background:#C75B66;animation:mtcFloat 3.1s ease-out .45s infinite;"></span>
+        <span style="position:absolute;left:82%;width:9px;height:9px;background:#990000;animation:mtcFloat 2.7s ease-out .2s infinite;"></span>
+      </div>
+    </sc-if>
+
+    <div style="text-align:center;margin-bottom:8px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;color:#7A0019;text-transform:uppercase;margin-bottom:12px;">{{ skeletonKicker }}</div>
+      <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:40px;margin:0 0 10px;letter-spacing:-.01em;">{{ skeletonTitle }}</h2>
+      <p style="font-size:16.5px;color:#5B6B7A;max-width:60ch;margin:0 auto;line-height:1.6;">A teaching portfolio is not a document you write the year you go up. It's an archive you keep and an argument you assemble. Here's the skeleton you built today — finish it this week while it's fresh.</p>
+    </div>
+
+    <div data-noprint="1" style="display:flex;justify-content:center;gap:12px;margin:24px 0 30px;flex-wrap:wrap;">
+      <button onClick="{{ exportPrint }}" style="display:inline-flex;align-items:center;gap:9px;background:#990000;color:#fff;border:none;font-weight:700;font-size:15px;padding:13px 22px;border-radius:11px;cursor:pointer;box-shadow:0 4px 14px rgba(153,0,0,.26);" style-hover="background:#7A0019;">Save as PDF</button>
+      <button onClick="{{ emailSelf }}" style="display:inline-flex;align-items:center;gap:9px;background:#990000;color:#fff;border:none;font-weight:700;font-size:15px;padding:13px 22px;border-radius:11px;cursor:pointer;" style-hover="background:#7A0019;">Email it to myself</button>
+      <button onClick="{{ copyAll }}" style="display:inline-flex;align-items:center;gap:9px;background:transparent;color:#2C2521;border:1px solid #D6CFBF;font-weight:600;font-size:15px;padding:13px 22px;border-radius:11px;cursor:pointer;" style-hover="border-color:#990000;color:#7A0019;">{{ copyLabel }}</button>
+    </div>
+
+    <div style="max-width:760px;margin:0 auto;background:#fff;border:1px solid #E7E1D5;border-radius:16px;padding:34px 38px;box-shadow:0 2px 8px rgba(30,42,56,.05);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #2C2521;padding-bottom:14px;margin-bottom:24px;">
+        <div>
+          <div style="font-family:'Spectral',serif;font-weight:700;font-size:24px;color:#2C2521;">Teaching Portfolio — working skeleton</div>
+          <div style="font-size:13.5px;color:#6B7785;margin-top:3px;">{{ skeletonName }}{{ skeletonCourse }}</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A98B5E;text-align:right;">{{ skeletonDate }}</div>
+      </div>
+
+      <div style="margin-bottom:26px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A0019;margin-bottom:8px;">1 · Narrative core</div>
+        <p style="font-family:'Spectral',serif;font-size:19px;line-height:1.6;color:#2A2218;margin:0;">{{ skeletonSentence }}</p>
+        <sc-if value="{{ hasWeak }}" hint-placeholder-val="{{ false }}"><p style="font-size:13.5px;color:#6B7785;margin:10px 0 0;">Next to develop: <strong style="color:#990000;">{{ d.a1weak }}</strong>.</p></sc-if>
+      </div>
+
+      <div style="margin-bottom:26px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A0019;margin-bottom:10px;">2 · Evidence mapped to criteria</div>
+        <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ skeletonRows }}" as="r" hint-placeholder-count="2">
+              <div style="display:flex;gap:12px;align-items:baseline;font-size:14.5px;line-height:1.5;">
+                <span style="color:{{ r.dotColor }};font-weight:700;flex:none;">{{ r.mark }}</span>
+                <span style="color:#2C2521;"><strong>{{ r.item }}</strong> <span style="color:#8A8472;">→ {{ r.criterion }}</span></span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}"><p style="font-size:14px;color:#A98B5E;font-style:italic;margin:0;">No evidence mapped yet — head back to Activity 2.</p></sc-if>
+        <sc-if value="{{ hasGap }}" hint-placeholder-val="{{ false }}"><div style="margin-top:14px;background:#F8E9E4;border:1px solid #E8CDC6;border-radius:9px;padding:11px 14px;font-size:14px;color:#7A0019;"><strong>Biggest gap to close:</strong> {{ d.a2gap }}</div></sc-if>
+      </div>
+
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A0019;margin-bottom:10px;">3 · 90-day plan</div>
+        <sc-if value="{{ hasMoves }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <sc-for list="{{ skeletonMoves }}" as="m" hint-placeholder-count="3">
+              <div style="display:flex;gap:12px;align-items:baseline;font-size:14.5px;line-height:1.5;">
+                <span style="font-family:'Spectral',serif;font-weight:700;color:#990000;flex:none;">{{ m.n }}</span>
+                <span style="color:#2C2521;">{{ m.text }} <sc-if value="{{ m.hasBy }}" hint-placeholder-val="{{ false }}"><span style="color:#8A8472;">· by {{ m.by }}</span></sc-if></span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noMoves }}" hint-placeholder-val="{{ false }}"><p style="font-size:14px;color:#A98B5E;font-style:italic;margin:0;">No moves yet — head back to Activity 3.</p></sc-if>
+        <sc-if value="{{ hasMentors }}" hint-placeholder-val="{{ false }}"><p style="font-size:14px;color:#41505E;margin:14px 0 0;"><strong>Mentors:</strong> {{ skeletonMentors }}</p></sc-if>
+        <sc-if value="{{ hasPartner }}" hint-placeholder-val="{{ false }}"><p style="font-size:14px;color:#41505E;margin:6px 0 0;"><strong>Accountability partner:</strong> {{ skeletonPartner }}</p></sc-if>
+      </div>
+    </div>
+
+    <p data-noprint="1" style="text-align:center;font-size:13.5px;color:#A98B5E;margin:26px auto 0;max-width:54ch;">Everything you typed is saved in this browser — come back to finish it. Start your private archive folder this week.</p>
+  </section>
+  </sc-if>
+
+  </div>
+  </main>
+
+  <footer data-noprint="1" style="border-top:1px solid #E4DECF;padding:20px 28px;text-align:center;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:#A89F8C;">MAKE THE CASE · BUILDING A TEACHING PORTFOLIO FOR PROMOTION · {{ inst }}</div>
+  </footer>
+
+  <!-- ===== PRESENT MODE OVERLAY ===== -->
+  <sc-if value="{{ present }}" hint-placeholder-val="{{ false }}">
+  <div data-noprint="1" style="position:fixed;inset:0;z-index:90;background:{{ pres.bg }};color:#fff;display:flex;flex-direction:column;animation:mtcFadeUp .35s ease both;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:26px 40px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.75);">{{ pres.kicker }}</div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button onClick="{{ presPrev }}" style="border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:14px;padding:8px 14px;border-radius:9px;cursor:pointer;">‹ Prev</button>
+        <button onClick="{{ presNext }}" style="border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:14px;padding:8px 14px;border-radius:9px;cursor:pointer;">Next ›</button>
+        <button onClick="{{ closePresent }}" style="border:none;background:rgba(255,255,255,.15);color:#fff;font-size:14px;font-weight:600;padding:8px 16px;border-radius:9px;cursor:pointer;">Exit ✕</button>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 7vw 4vh;max-width:1400px;margin:0 auto;width:100%;">
+      <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:5.4vw;line-height:1.04;margin:0 0 3vh;letter-spacing:-.01em;">{{ pres.title }}</h1>
+      <p style="font-size:2vw;line-height:1.5;color:rgba(255,255,255,.88);max-width:30ch;margin:0 0 5vh;">{{ pres.setup }}</p>
+      <div style="display:flex;flex-direction:column;gap:2.2vh;">
+        <sc-for list="{{ pres.steps }}" as="s" hint-placeholder-count="3">
+          <div style="display:flex;gap:20px;align-items:baseline;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:1.4vw;color:rgba(255,255,255,.6);flex:none;min-width:5vw;">{{ s.time }}</span>
+            <span style="font-size:1.8vw;color:#fff;">{{ s.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:24px 40px;border-top:1px solid rgba(255,255,255,.15);">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:7vw;font-weight:500;line-height:1;color:#fff;">{{ pres.timer }}</div>
+      <div style="display:flex;gap:12px;">
+        <button onClick="{{ pres.toggle }}" style="border:none;background:#fff;color:{{ pres.bg }};font-weight:700;font-size:18px;padding:14px 30px;border-radius:12px;cursor:pointer;">{{ pres.timerLabel }}</button>
+        <button onClick="{{ pres.reset }}" style="border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;font-size:16px;padding:14px 22px;border-radius:12px;cursor:pointer;">Reset</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1120,&quot;height&quot;:760},&quot;institution&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Luddy School of Informatics Computing and Engineering&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;a1Minutes&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:9,&quot;min&quot;:1,&quot;max&quot;:30,&quot;tsType&quot;:&quot;number&quot;},&quot;a2Minutes&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:10,&quot;min&quot;:1,&quot;max&quot;:30,&quot;tsType&quot;:&quot;number&quot;},&quot;a3Minutes&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:4,&quot;min&quot;:1,&quot;max&quot;:30,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.KEY = 'make-the-case-v1';
+    const a1m = (this.props.a1Minutes ?? 9) * 60;
+    const a2m = (this.props.a2Minutes ?? 10) * 60;
+    const a3m = (this.props.a3Minutes ?? 4) * 60;
+    const defaults = {
+      data: { name:'', course:'', warmupGuidance:'', warmupClarity:'', a1a:'', a1b:'', a1weak:'', a2gap:'',
+        move1:'', by1:'', move2:'', by2:'', move3:'', by3:'',
+        mentor1:'', mentor2:'', apName:'', apContact:'', apCommit:'' },
+      rows: [ {item:'',criterion:'',status:'build'}, {item:'',criterion:'',status:'build'}, {item:'',criterion:'',status:'build'} ],
+      checklist: this.checklistDefaults(),
+    };
+    const saved = this.load();
+    this.state = {
+      activeTab: 0,
+      present: false,
+      presentAct: 1,
+      copied: false,
+      data: { ...defaults.data, ...(saved.data||{}) },
+      rows: (saved.rows && saved.rows.length) ? saved.rows : defaults.rows,
+      checklist: this.mergeChecklist(saved.checklist),
+      timers: { a1:{r:a1m,init:a1m,run:false}, a2:{r:a2m,init:a2m,run:false}, a3:{r:a3m,init:a3m,run:false} },
+      fb: { a1:{loading:false,text:''}, a2:{loading:false,text:''} },
+      liveStatus: this.liveStatusNow(),
+      liveResponses: [],
+      liveSession: this.initialSession(),
+      posting: false, posted: false, postError: '', postAnon: false,
+    };
+  }
+
+  liveStatusNow(){ return (typeof window!=='undefined' && window.MTC_LIVE && window.MTC_LIVE.status) || 'init'; }
+  initialSession(){
+    try { const s = localStorage.getItem('mtc-live-session'); if (s) return s; } catch(e){}
+    return 'mtc-' + new Date().toISOString().slice(0,10);
+  }
+  clarityColor(v){ return ({'Opaque':'#7A0019','Vague':'#A33A2A','Mixed':'#B98A3C','Mostly clear':'#5E8C4F','Crystal clear':'#2E7D54'})[v] || '#A89F8C'; }
+  postModeStyle(anon){
+    const active = this.state.postAnon === anon;
+    return `border:1px solid ${active?'#990000':'#E0D6C2'};background:${active?'#990000':'#fff'};color:${active?'#fff':'#5B6B7A'};font-weight:600;font-size:13px;padding:9px 14px;border-radius:9px;cursor:pointer;`;
+  }
+
+  onLiveEvent = () => this.setState({ liveStatus: this.liveStatusNow() }, () => { if (this.state.activeTab === 8) this.ensureSubscribed(); });
+  ensureSubscribed(){
+    if (this._unsub) return;
+    if (this.liveStatusNow() !== 'ready' || !(window.MTC_LIVE && window.MTC_LIVE.subscribe)) return;
+    try { this._unsub = window.MTC_LIVE.subscribe(this.state.liveSession, arr => this.setState({ liveResponses: arr })); } catch(e){}
+  }
+  unsubscribe(){ if (this._unsub) { try { this._unsub(); } catch(e){} this._unsub = null; } }
+  changeSession(code){
+    const v = (code||'').trim() || ('mtc-' + new Date().toISOString().slice(0,10));
+    this.unsubscribe();
+    try { localStorage.setItem('mtc-live-session', v); } catch(e){}
+    this.setState({ liveSession: v, liveResponses: [] }, () => { if (this.state.activeTab === 8) this.ensureSubscribed(); });
+  }
+  async liveSubmit(){
+    const d = this.state.data;
+    if (!d.warmupGuidance.trim() && !d.warmupClarity) return;
+    const name = this.state.postAnon ? 'Anonymous' : (d.name.trim() || 'Anonymous');
+    if (this.liveStatusNow() !== 'ready' || !(window.MTC_LIVE && window.MTC_LIVE.submit)) {
+      this.setState({ postError: 'Live sharing isn’t set up yet — your response is saved on this device. Facilitator: open the Live Wall tab for the one-time setup.' });
+      return;
+    }
+    this.setState({ posting:true, postError:'' });
+    try {
+      await window.MTC_LIVE.submit(this.state.liveSession, { text: d.warmupGuidance.trim(), clarity: d.warmupClarity||'', name });
+      this.setState({ posting:false, posted:true });
+    } catch(e) {
+      this.setState({ posting:false, postError: (e && e.message) || 'Could not post — check your connection and Firestore rules.' });
+    }
+  }
+
+  checklistDefaults() {
+    return [
+      'Table of contents with section headings and page numbers.',
+      'Summary of teaching responsibilities: courses, levels, enrollments, your role.',
+      'Teaching statement: a scholarly analysis, 1–4 pages, present tense, first person, organized by claim / evidence / reasoning.',
+      'Course descriptions: level, size, modality, your role, innovations.',
+      'Course materials: 2–3 syllabi, 1–2 activities per course, 1–2 graded student samples.',
+      'A rationale for every item: audience, why and how you used it, the effect on learning.',
+      'Quantitative ratings: 5–7 items, graphed or tabulated, with analysis and a scale legend.',
+      'Qualitative ratings: 4–5 themes, one growth area, 2–3 quotes each.',
+      'Evidence beyond ratings: concept-inventory gains, DFW & equity data, retention, artifacts, peer feedback.',
+      'Peer & professional evidence: observations, TA supervision, curriculum work, scholarship, awards, grants.',
+      'Reflection with the evidence: every section says why it is here and what students learned.',
+      'A revised CV that points to the portfolio, and everything mapped to your criteria in their language.',
+    ].map(label => ({ label, checked:false }));
+  }
+  mergeChecklist(saved) {
+    const def = this.checklistDefaults();
+    if (!saved || !Array.isArray(saved)) return def;
+    return def.map((c,i) => ({ ...c, checked: !!(saved[i] && saved[i].checked) }));
+  }
+
+  load() {
+    try { return JSON.parse(localStorage.getItem(this.KEY)) || {}; } catch(e){ return {}; }
+  }
+  persist = () => {
+    try {
+      localStorage.setItem(this.KEY, JSON.stringify({
+        data: this.state.data, rows: this.state.rows, checklist: this.state.checklist,
+      }));
+    } catch(e){}
+  };
+
+  componentDidMount() {
+    this._iv = setInterval(() => this.tick(), 1000);
+    window.addEventListener('mtc-live', this.onLiveEvent);
+    this.setState({ liveStatus: this.liveStatusNow() });
+  }
+  componentWillUnmount() {
+    clearInterval(this._iv);
+    window.removeEventListener('mtc-live', this.onLiveEvent);
+    this.unsubscribe();
+  }
+  tick() {
+    this.setState(s => {
+      let changed = false; const t = { ...s.timers };
+      for (const k of ['a1','a2','a3']) {
+        if (t[k].run && t[k].r > 0) { t[k] = { ...t[k], r: t[k].r - 1 }; changed = true; if (t[k].r === 0) t[k].run = false; }
+      }
+      return changed ? { timers:t } : null;
+    });
+  }
+
+  go(i){ return () => this.setState({ activeTab:i }, () => { if (i === 8) this.ensureSubscribed(); else this.unsubscribe(); }); }
+
+  field(key){ return e => { const v = e.target.value; this.setState(s => ({ data:{...s.data,[key]:v} }), this.persist); }; }
+  setWeak(v){ return () => this.setState(s => ({ data:{...s.data, a1weak: s.data.a1weak===v ? '' : v} }), this.persist); }
+  setClarity(v){ return () => this.setState(s => ({ data:{...s.data, warmupClarity: s.data.warmupClarity===v ? '' : v} }), this.persist); }
+  clarityStyle(v){
+    const active = this.state.data.warmupClarity === v;
+    return `flex:1;border:1px solid ${active?'#990000':'#E0D6C2'};background:${active?'#990000':'#fff'};color:${active?'#fff':'#5B6B7A'};font-weight:600;font-size:13px;padding:10px 6px;border-radius:9px;cursor:pointer;transition:all .15s;white-space:nowrap;`;
+  }
+
+  setRow(i,key,v){ this.setState(s => { const rows = s.rows.slice(); rows[i] = {...rows[i],[key]:v}; return {rows}; }, this.persist); }
+  toggleRow(i){ this.setState(s => { const rows = s.rows.slice(); rows[i] = {...rows[i], status: rows[i].status==='have'?'build':'have'}; return {rows}; }, this.persist); }
+  addRow = () => this.setState(s => ({ rows:[...s.rows, {item:'',criterion:'',status:'build'}] }), this.persist);
+  removeRow(i){ this.setState(s => { const rows = s.rows.slice(); rows.splice(i,1); return { rows: rows.length?rows:[{item:'',criterion:'',status:'build'}] }; }, this.persist); }
+
+  toggleCheck(i){ this.setState(s => { const c = s.checklist.slice(); c[i] = {...c[i], checked:!c[i].checked}; return {checklist:c}; }, this.persist); }
+
+  useIdea(text){ return () => this.setState(s => {
+    const d = {...s.data};
+    if (!d.move1.trim()) d.move1 = text; else if (!d.move2.trim()) d.move2 = text; else if (!d.move3.trim()) d.move3 = text; else d.move3 = text;
+    return { data:d };
+  }, this.persist); }
+
+  startStop(k){ return () => this.setState(s => ({ timers:{...s.timers, [k]:{...s.timers[k], run:!s.timers[k].run}} })); }
+  resetTimer(k){ return () => this.setState(s => ({ timers:{...s.timers, [k]:{...s.timers[k], r:s.timers[k].init, run:false}} })); }
+  fmt(sec){ const m = Math.floor(sec/60), s = sec%60; return m + ':' + String(s).padStart(2,'0'); }
+  timerObj(k){
+    const t = this.state.timers[k];
+    return {
+      display: this.fmt(t.r),
+      label: t.run ? 'Pause' : (t.r < t.init ? 'Resume' : 'Start'),
+      color: t.r === 0 ? '#990000' : (t.run ? '#7A0019' : '#2C2521'),
+      toggle: this.startStop(k), reset: this.resetTimer(k),
+    };
+  }
+
+  openPresent = () => { const map = {1:1,2:2,3:3}; const act = map[this.state.activeTab] || 1; this.setState({ present:true, presentAct:act }); };
+  closePresent = () => this.setState({ present:false });
+  presStep(d){ return () => this.setState(s => ({ presentAct: Math.min(3, Math.max(1, s.presentAct + d)) })); }
+
+  presentData() {
+    const a = this.state.presentAct;
+    const defs = {
+      1: { kicker:'Activity 1 · Hands-on · 9 min', title:'Draft your narrative core', bg:'#2C2521', key:'a1',
+           setup:'Fill the stem for one course. Write silently. Do not polish — we want a true rough draft.',
+           steps:[ {time:'7 min',text:'Silent rough draft for one course.'}, {time:'2 min',text:'A few volunteers read aloud.'}, {time:'—',text:'Together, locate the claim, evidence, and reasoning.'} ] },
+      2: { kicker:'Activity 2 · Hands-on · 10 min', title:'Map evidence to your criteria', bg:'#7A0019', key:'a2',
+           setup:'Open your promotion guidelines. The left column uses their words, not mine.',
+           steps:[ {time:'6 min',text:'List evidence you hold; map at least three items.'}, {time:'—',text:'Flag your single biggest gap.'}, {time:'3 min',text:'Trade workbooks: strongest piece? what is missing?'} ] },
+      3: { kicker:'Activity 3 · Hands-on · 4 min', title:'Your 90-day plan and mentors', bg:'#990000', key:'a3',
+           setup:'Three small, specific moves for the next 90 days. Specific beats ambitious.',
+           steps:[ {time:'3 min',text:'Three moves, starting from your biggest gap.'}, {time:'—',text:'Name two mentors to contact this month.'}, {time:'1 min',text:'Swap one commitment with a partner.'} ] },
+    };
+    const def = defs[a];
+    const t = this.state.timers[def.key];
+    return { ...def, timer: this.fmt(t.r), timerLabel: t.run ? 'Pause' : (t.r < t.init ? 'Resume' : 'Start timer'),
+      toggle: this.startStop(def.key), reset: this.resetTimer(def.key) };
+  }
+
+  async getFb(which) {
+    this.setState(s => ({ fb:{...s.fb, [which]:{loading:true,text:''}} }));
+    let prompt;
+    if (which === 'a1') {
+      const d = this.state.data;
+      const sent = `I am an effective teacher because I make intentional choices such as ${d.a1a||'[blank]'}, and as a result my students ${d.a1b||'[blank]'}.`;
+      prompt = `You are a warm, sharp faculty-development coach for teaching-track computer science faculty building a promotion portfolio. Read this draft "narrative core" sentence and give brief, encouraging, concrete feedback (max 110 words, plain prose, no headings, no bullet symbols). Name one thing that is working, then assess whether it has (1) a clear CLAIM, (2) real EVIDENCE you could actually show a committee, and (3) REASONING that connects the choice to the result. End with the single most useful next move. Draft: "${sent}"`;
+    } else {
+      const rows = this.state.rows.filter(r => r.item.trim() || r.criterion.trim());
+      const list = rows.length ? rows.map(r => `- ${r.item||'(no item)'} -> ${r.criterion||'(no criterion)'} [${r.status}]`).join('\n') : '(none entered yet)';
+      const gap = this.state.data.a2gap || '(not named)';
+      prompt = `You are a warm, sharp faculty-development coach for teaching-track CS faculty. Below is an instructor's evidence-to-criteria map and their stated biggest gap. Give brief, encouraging, concrete feedback (max 120 words, plain prose, no headings). Comment on: which item reads as the strongest piece of evidence, whether any item is mapped to a vague rather than a specific criterion, and one piece of evidence they likely overlook (e.g. TA mentoring, an OER assignment set, a workshop, a grant). Map:\n${list}\nBiggest gap: ${gap}`;
+    }
+    try {
+      const text = await window.claude.complete(prompt);
+      this.setState(s => ({ fb:{...s.fb, [which]:{loading:false, text: (text||'').trim()}} }));
+    } catch(err) {
+      this.setState(s => ({ fb:{...s.fb, [which]:{loading:false, text:'Live feedback is available when this runs in the workshop tool. For now, read your draft against the three parts yourself: is the claim clear, is the evidence something you could actually show, and does the reasoning connect them?'}} }));
+    }
+  }
+
+  sentence() {
+    const d = this.state.data;
+    const a = d.a1a.trim(), b = d.a1b.trim();
+    return `I am an effective teacher because I make intentional choices such as ${a||'…'}, and as a result my students ${b||'…'}.`;
+  }
+
+  compile() {
+    const d = this.state.data;
+    const L = [];
+    L.push('MAKE THE CASE — Teaching Portfolio working skeleton');
+    if (d.name || d.course) L.push((d.name||'') + (d.course?(' · '+d.course):''));
+    L.push('');
+    L.push('1. NARRATIVE CORE');
+    L.push(this.sentence());
+    if (d.a1weak) L.push('Next to develop: ' + d.a1weak);
+    L.push('');
+    L.push('2. EVIDENCE MAPPED TO CRITERIA');
+    const rows = this.state.rows.filter(r => r.item.trim() || r.criterion.trim());
+    if (rows.length) rows.forEach(r => L.push(`[${r.status==='have'?'HAVE':'BUILD'}] ${r.item||'(item)'} -> ${r.criterion||'(criterion)'}`));
+    else L.push('(none yet)');
+    if (d.a2gap) L.push('Biggest gap: ' + d.a2gap);
+    L.push('');
+    L.push('3. 90-DAY PLAN');
+    [['1',d.move1,d.by1],['2',d.move2,d.by2],['3',d.move3,d.by3]].forEach(([n,m,by]) => { if (m.trim()) L.push(`${n}. ${m}${by?(' (by '+by+')'):''}`); });
+    const mentors = [d.mentor1,d.mentor2].filter(x=>x.trim());
+    if (mentors.length) L.push('Mentors: ' + mentors.join(' ; '));
+    if (d.apName.trim()) L.push('Accountability partner: ' + d.apName + (d.apContact?(' ('+d.apContact+')'):'') + (d.apCommit?(' — '+d.apCommit):''));
+    return L.join('\n');
+  }
+
+  exportPrint = () => { this.setState({ activeTab:7 }, () => setTimeout(() => window.print(), 350)); };
+  emailSelf = () => {
+    const body = this.compile();
+    window.location.href = 'mailto:?subject=' + encodeURIComponent('My Make the Case portfolio skeleton') + '&body=' + encodeURIComponent(body);
+  };
+  copyAll = () => {
+    const text = this.compile();
+    const done = () => { this.setState({ copied:true }); setTimeout(() => this.setState({ copied:false }), 1800); };
+    try { navigator.clipboard.writeText(text).then(done, done); } catch(e){ done(); }
+  };
+  restart = () => {
+    if (!confirm('Clear everything you have typed? This cannot be undone.')) return;
+    try { localStorage.removeItem(this.KEY); } catch(e){}
+    const a1m=(this.props.a1Minutes??9)*60, a2m=(this.props.a2Minutes??10)*60, a3m=(this.props.a3Minutes??4)*60;
+    this.setState({
+      activeTab:0, present:false,
+      data:{ name:'',course:'',warmupGuidance:'',warmupClarity:'',a1a:'',a1b:'',a1weak:'',a2gap:'',move1:'',by1:'',move2:'',by2:'',move3:'',by3:'',mentor1:'',mentor2:'',apName:'',apContact:'',apCommit:'' },
+      rows:[{item:'',criterion:'',status:'build'},{item:'',criterion:'',status:'build'},{item:'',criterion:'',status:'build'}],
+      checklist:this.checklistDefaults(),
+      timers:{ a1:{r:a1m,init:a1m,run:false}, a2:{r:a2m,init:a2m,run:false}, a3:{r:a3m,init:a3m,run:false} },
+      fb:{ a1:{loading:false,text:''}, a2:{loading:false,text:''} },
+    });
+  };
+
+  tabStyle(i) {
+    const active = this.state.activeTab === i;
+    return `display:inline-flex;align-items:center;white-space:nowrap;border:none;cursor:pointer;font-size:14px;font-weight:600;padding:9px 15px;border-radius:9px;transition:all .15s;`
+      + (active ? `background:#2C2521;color:#fff;` : `background:transparent;color:#6B7785;`);
+  }
+  weakStyle(v) {
+    const active = this.state.data.a1weak === v;
+    return `flex:1;border:1px solid ${active?'#990000':'#E0D6C2'};background:${active?'#990000':'#fff'};color:${active?'#fff':'#5B6B7A'};font-weight:600;font-size:13.5px;padding:10px 6px;border-radius:9px;cursor:pointer;transition:all .15s;`;
+  }
+  rowStatusStyle(status) {
+    const have = status === 'have';
+    return `border:1px solid ${have?'#C8E2D2':'#E8CDC6'};border-left:1px solid #F0EBE0;background:${have?'#E6F1EA':'#F8E9E4'};color:${have?'#2E7D54':'#7A0019'};font-weight:600;font-size:12.5px;cursor:pointer;`;
+  }
+
+  resourceData() {
+    const institutions = [
+      { name:'University of Chicago', center:'Chicago Center for Teaching and Learning (CCTL)', url:'https://teaching.uchicago.edu/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' a quarterly Seminar on Teaching Portfolios walks through the teaching statement and portfolio, and a follow-up Workshop on Teaching Portfolios gives guided peer feedback on a draft. The College Teaching Certificate is built around producing both — open to faculty as a model, strongest fit for early-career and postdocs.' },
+          { lead:'', text:'For faculty specifically, book a confidential CCTL consultation on your statement or portfolio and use the CCTL Faculty Teaching Handbook.' },
+          { lead:'', text:'The broader UChicago Faculty Development Program covers teaching alongside research and career support.' },
+        ],
+        keyPages:[
+          { label:'College Teaching Certificate', url:'https://teaching.uchicago.edu/programs/college-teaching-certificate-program' },
+          { label:'Faculty Development Program', url:'https://facultydevelopment.uchicago.edu/teaching/cctl/' },
+        ] },
+      { name:'University of Illinois Chicago (UIC)', center:'Center for the Advancement of Teaching Excellence (CATE)', url:'https://teaching.uic.edu/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' CATE runs a Writing an Effective Teaching Statement workshop and a set of Reflective Teaching guides (peer-observation training, analyzing student and peer evaluation feedback) that feed straight into a portfolio. For P&T, CATE points faculty to the Vice Provost for Faculty Affairs guidelines.' },
+          { lead:'', text:'The FOCI program produces a teaching statement, syllabus, and portfolio, oriented toward graduate students and the job market.' },
+          { lead:'', text:'Read the UIC promotion and tenure guidelines so your portfolio uses their categories.' },
+        ],
+        keyPages:[
+          { label:'Writing an Effective Teaching Statement', url:'https://teaching.uic.edu/events/writing-an-effective-teaching-statement/' },
+          { label:'Reflective Teaching guides', url:'https://teaching.uic.edu/cate-teaching-guides/reflective-teaching-guides/' },
+          { label:'P&T guidelines', url:'https://faculty.uic.edu/for-administrators/promotion-and-tenure/' },
+        ] },
+      { name:'Northwestern University', center:'Searle Center for Advancing Learning & Teaching', url:'https://searle.northwestern.edu/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' the Reflective and Effective Teaching (RET) program is a three-quarter sequence in which participants build a reflective ePortfolio and a teaching statement from curated artifacts. The Searle Learning & Teaching Guides cover documenting teaching directly.' },
+          { lead:'', text:'Searle Fellows (early-career faculty) and New Faculty Transitions give a cohort to develop and document teaching alongside.' },
+          { lead:'', text:'Northwestern\u2019s PhD-Postdoc Careers office adds a goals-methods-results teaching-statement guide.' },
+        ],
+        keyPages:[
+          { label:'Reflective and Effective Teaching', url:'https://searle.northwestern.edu/programs-services/programs/program-pages/reflective-and-effective-teaching.html' },
+          { label:'Learning & Teaching Guides', url:'https://searle.northwestern.edu/resources/our-tools-guides/learning-teaching-guides/' },
+        ] },
+      { name:'University of Illinois Urbana-Champaign (UIUC)', center:'Center for Innovation in Teaching & Learning (CITL)', url:'https://citl.illinois.edu/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' CITL runs a dedicated Teaching Portfolio Program, a Develop a Teaching Philosophy guide, and Teaching Certificates that document your development. Pair these with CITL\u2019s evaluation-data support for the evidence section.' },
+          { lead:'Know the requirements:', text:' the Provost\u2019s annual Promotion and Tenure communication spells out the portfolio (multi-year, multi-criteria student and peer feedback) and a teaching statement of no more than three pages.' },
+          { lead:'', text:'Pair with the Grainger College of Engineering and the CS department for discipline-specific support.' },
+        ],
+        keyPages:[
+          { label:'Teaching Portfolio Program', url:'https://citl.illinois.edu/citl-101/teaching-learning/conferences-workshops/teaching-portfolio-program' },
+          { label:'Develop a Teaching Philosophy', url:'https://citl.illinois.edu/develop-teaching-philosophy' },
+          { label:'Provost P&T communication', url:'https://provost.illinois.edu/policies/provosts-communications/communication-9-promotion-and-tenure/' },
+        ] },
+      { name:'Purdue University', center:'Center for Instructional Excellence (CIE)', url:'https://www.purdue.edu/cie/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' the IMPACT Resources for Teaching and Learning library guide includes a Developing Your Teaching Philosophy module, and CIE consultations (cie@purdue.edu) review statements and portfolios. The College Teaching Development Program builds documented teaching skills.' },
+          { lead:'', text:'IMPACT course-redesign and the Teaching Academy generate the artifacts and evidence a portfolio draws on.' },
+          { lead:'', text:'Sits under the Office of the Vice Provost for Teaching and Learning, which coordinates campus-wide development.' },
+        ],
+        keyPages:[
+          { label:'Developing Your Teaching Philosophy (IMPACT)', url:'https://guides.lib.purdue.edu/c.php?g=1118684&p=8515172' },
+          { label:'College Teaching Development Program', url:'https://www.purdue.edu/innovativelearning/programs/ctdp/' },
+        ] },
+      { name:'Indiana University Bloomington', center:'Center for Innovative Teaching and Learning (CITL)', url:'https://citl.indiana.edu/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' CITL has a Documenting Teaching resource set with dedicated Teaching Portfolios and Teaching Statements & Philosophies pages, and consultants who give feedback on a reflective statement or portfolio in progress.' },
+          { lead:'', text:'Consultations also cover class observations and course-evaluation review, which build the evidence the portfolio needs.' },
+          { lead:'', text:'A New Faculty Programs track and orientation help early-career faculty start documenting from day one.' },
+        ],
+        keyPages:[
+          { label:'Teaching Portfolios', url:'https://citl.indiana.edu/teaching-resources/documenting-teaching/teaching-portfolios/index.html' },
+          { label:'Teaching Statements & Philosophies', url:'https://citl.indiana.edu/teaching-resources/documenting-teaching/teaching-statements-philosophies/' },
+          { label:'Consultations', url:'https://citl.indiana.edu/consultations/index.html' },
+        ] },
+      { name:'Indiana University Indianapolis (IU Indy)', center:'Center for Teaching and Learning (CTL)', url:'https://ctl.indianapolis.iu.edu/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' CTL has a dedicated Resources for Teaching Portfolios page covering the teaching-philosophy statement, evaluation summaries, sample course materials and student work, observation reports, and a teaching-focused CV. Instructional consultants do confidential classroom observations and individual consultations.' },
+          { lead:'', text:'Pair these with the IU Indianapolis Office of Academic Affairs promotion-and-tenure guidelines and dossier samples.' },
+          { lead:'', text:'CTL also runs a Faculty Fellows program and teaching grants and awards that generate portfolio-worthy evidence.' },
+        ],
+        keyPages:[
+          { label:'Resources for Teaching Portfolios', url:'https://ctl.indianapolis.iu.edu/Resources/Documenting-Your-Teaching/Resources-for-Teaching-Portfolios' },
+          { label:'CTL programs', url:'https://ctl.indianapolis.iu.edu/Programs' },
+        ] },
+      { name:'University of Notre Dame', center:'Kaneb Center for Teaching Excellence (Notre Dame Learning)', url:'https://learning.nd.edu/about/kaneb-center/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' the Kaneb Center offers a Developing Your Teaching Portfolio workshop (it can run this for a department) and a Writing a Teaching Statement guide in its resource library. Confidential consultations review a draft.' },
+          { lead:'', text:'The Teaching at Notre Dame series (early-career faculty) and the Course Design Academy generate documented, evidence-based teaching to put in the portfolio.' },
+          { lead:'', text:'Graduate Career Services adds academic-portfolio guidance for those still on the job market.' },
+        ],
+        keyPages:[
+          { label:'Developing Your Teaching Portfolio', url:'https://learning.nd.edu/workshops-and-events/workshops-we-can-offer/developing-your-teaching-portfolio/' },
+          { label:'Writing a Teaching Statement', url:'https://learning.nd.edu/resource-library/writing-a-teaching-statement/' },
+          { label:'Teaching at Notre Dame series', url:'https://learning.nd.edu/consultations-and-programs/teaching-at-notre-dame-series/' },
+        ] },
+      { name:'Loyola University Chicago', center:'Center for Faculty Development', url:'https://www.luc.edu/centerforfacultydevelopment/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' the Learning Portfolio (ePortfolio) Program, run through CELTS, supports faculty building a portfolio for promotion and tenure, with a faculty/staff track and a gallery of examples.' },
+          { lead:'', text:'The Center for Faculty Development adds teaching consultations grounded in Ignatian, inclusive, and innovative teaching, across all career stages.' },
+          { lead:'', text:'Because Loyola is teaching-focused, its portfolio support leans toward reflective teaching practice; map it to your unit\u2019s P&T criteria.' },
+        ],
+        keyPages:[
+          { label:'Learning Portfolio Program', url:'https://www.luc.edu/celts/programs/learningportfolio/' },
+          { label:'Faculty/staff portfolio track', url:'https://www.luc.edu/experiential/learningportfolio/facultstaff.shtml' },
+        ] },
+    ];
+    const csGroups = [
+      { heading:'Career and professional development', items:[
+        { text:'CRA-E professional development for teaching-track CS faculty (the model for many regional events):', label:'CRA-E pre-symposium hub', url:'https://cra.org/crae/cra-professional-development-pre-symposium-for-teaching-track-faculty/' },
+        { text:'ACM SIGCSE community — the Technical Symposium, plus ITiCSE and ICER, for CS-education scholarship, teaching-track sessions, and mentoring:', label:'SIGCSE', url:'https://sigcse.org/' },
+        { text:'NCWIT (National Center for Women & Information Technology) for broadening-participation resources you can cite in teaching and service:', label:'NCWIT', url:'https://ncwit.org/' },
+      ] },
+      { heading:'Evidence and pedagogy', items:[
+        { text:'CS concept inventory (SCS1) for learning-gain evidence beyond ratings:', label:'SCS1 validation paper', url:'https://sci.sdsu.edu/crmse/msed/papers/parker2-parker-guzdial-engleman_SCS1.pdf' },
+        { text:'Mastery and specifications grading outcomes in CS1:', label:'Zilles et al., SIGCSE 2024', url:'https://zilles.cs.illinois.edu/papers/mastery_INSPER_SIGCSE_2024.pdf' },
+        { text:'Generative AI in introductory programming, a community guidance report:', label:'ACM, 2023', url:'https://csed.acm.org/wp-content/uploads/2023/12/Generative-AI-Nov-2023-Version.pdf' },
+      ] },
+      { heading:'Portfolio and dossier guides', items:[
+        { text:'Brown University, Sheridan Center — The Teaching Portfolio handbook:', label:'Sheridan Center resources', url:'https://sheridan.brown.edu/resources' },
+        { text:'Seldin, Miller & Seldin — The Teaching Portfolio: A Practical Guide to Improved Performance and Promotion/Tenure Decisions:', label:'The Teaching Portfolio (book)', url:'https://amzn.to/4oUnarJ' },
+        { text:'Ohio State, Drake Institute — Teaching Portfolio Development:', label:'Drake Institute', url:'https://drakeinstitute.osu.edu/institute-articles/teaching-portfolio-development' },
+        { text:'Burnham, Hooper & Wright — Top 10 strategies for the annual dossier:', label:'Faculty Focus', url:'https://www.facultyfocus.com/articles/faculty-development/top-10-strategies-for-preparing-the-annual-tenure-and-promotion-dossier/' },
+      ] },
+    ];
+    institutions.forEach(i => { i.accent = '#DDBFB8'; });
+    const deptItems = [
+      { n:'1', text:'Pull your department\u2019s promotion and tenure guidelines for teaching-track faculty and read the exact criteria. Everything in your portfolio maps to that language.' },
+      { n:'2', text:'Find two mentors: a recently promoted peer who just did this, and a senior colleague who has served on the review committee (ask to see an exemplary dossier).' },
+      { n:'3', text:'Start a private archive folder now — ratings, artifacts, peer-observation notes, emails, grant letters. You will not rebuild four years of evidence the summer before you go up.' },
+      { n:'4', text:'Book one consultation with your teaching center on your teaching statement or portfolio before the term gets busy.' },
+    ];
+    return { institutions, csGroups, deptItems };
+  }
+
+  renderVals() {
+    const s = this.state, d = s.data;
+    // progress
+    const milestones = [
+      (d.name.trim() || d.course.trim()),
+      (d.a1a.trim() && d.a1b.trim()),
+      (s.rows.filter(r=>r.item.trim()).length >= 1),
+      (s.rows.filter(r=>r.item.trim()).length >= 3 && d.a2gap.trim()),
+      (d.move1.trim() && d.move2.trim() && d.move3.trim()),
+      ((d.mentor1.trim()||d.mentor2.trim()) && d.apName.trim()),
+    ];
+    const progressPct = Math.round(100 * milestones.filter(Boolean).length / milestones.length);
+    const done1 = !!(d.a1a.trim() && d.a1b.trim());
+    const done2 = !!(s.rows.filter(r=>r.item.trim()).length >= 3 && d.a2gap.trim());
+    const done3 = !!(d.move1.trim() && d.move2.trim() && d.move3.trim() && (d.mentor1.trim()||d.mentor2.trim()));
+    const doneAll = done1 && done2 && done3;
+
+    const a1Words = (d.a1a.trim()+' '+d.a1b.trim()).trim().split(/\s+/).filter(Boolean).length;
+
+    // evidence rows
+    const rows = s.rows.map((r,i) => ({
+      item:r.item, criterion:r.criterion,
+      onItem: e => this.setRow(i,'item',e.target.value),
+      onCriterion: e => this.setRow(i,'criterion',e.target.value),
+      toggle: () => this.toggleRow(i),
+      remove: () => this.removeRow(i),
+      statusLabel: r.status==='have' ? 'Have it' : 'Build it',
+      statusStyle: this.rowStatusStyle(r.status),
+    }));
+
+    const ideaLabels = [
+      'Start the archive folder this week',
+      'Ask a mentor to read my draft statement',
+      'Request a peer observation next month',
+      'Pull 4 semesters of ratings into one table',
+      'Export one signature assignment + student work',
+      'Write one paragraph contextualizing my ratings',
+    ];
+    const ideas = ideaLabels.map(label => ({ label, use: this.useIdea(label) }));
+
+    const checklist = s.checklist.map((c,i) => ({ label:c.label, checked:c.checked, toggle: () => this.toggleCheck(i) }));
+    const checklistPct = Math.round(100 * s.checklist.filter(c=>c.checked).length / s.checklist.length);
+
+    // skeleton
+    const skRows = s.rows.filter(r=>r.item.trim()).map(r => ({
+      item:r.item, criterion:r.criterion.trim()||'(map to a criterion)',
+      mark: r.status==='have'?'✓':'○', dotColor: r.status==='have'?'#2E7D54':'#7A0019',
+    }));
+    const skMoves = [['1',d.move1,d.by1],['2',d.move2,d.by2],['3',d.move3,d.by3]]
+      .filter(([n,m]) => m.trim())
+      .map(([n,m,by]) => ({ n, text:m, by, hasBy: !!by.trim() }));
+    const mentors = [d.mentor1,d.mentor2].filter(x=>x.trim());
+    const presD = this.presentData();
+
+    const res = this.resourceData();
+
+    // ----- live warm-up -----
+    const liveStatus = s.liveStatus;
+    const clarOrder = ['Opaque','Vague','Mixed','Mostly clear','Crystal clear'];
+    const counts = {}; clarOrder.forEach(o => counts[o] = 0);
+    s.liveResponses.forEach(r => { if (counts[r.clarity] != null) counts[r.clarity]++; });
+    const maxc = Math.max(1, ...clarOrder.map(o => counts[o]));
+    const tally = clarOrder.map(o => ({ label:o, count:counts[o], pct: Math.round(100*counts[o]/maxc), color:this.clarityColor(o) }));
+    const cards = s.liveResponses.slice().reverse().map(r => ({
+      id:r.id, name:r.name||'Anonymous', text:(r.text||'').trim(), clarity:r.clarity||'',
+      color:this.clarityColor(r.clarity), hasText:!!(r.text&&r.text.trim()), hasClarity:!!r.clarity,
+    }));
+    const canPost = !!(d.warmupGuidance.trim() || d.warmupClarity);
+
+    return {
+      inst: this.props.institution ?? 'Indiana University · Center for Innovative Teaching & Learning',
+      institutions: res.institutions, csGroups: res.csGroups, deptItems: res.deptItems,
+      progressPct, done1, done2, done3, doneAll,
+
+      // tabs
+      isTab0:s.activeTab===0, isTab1:s.activeTab===1, isTab2:s.activeTab===2, isTab3:s.activeTab===3,
+      isTab4:s.activeTab===4, isTab5:s.activeTab===5, isTab6:s.activeTab===6, isTab7:s.activeTab===7, isTab8:s.activeTab===8,
+      goTo0:this.go(0), goTo1:this.go(1), goTo2:this.go(2), goTo3:this.go(3),
+      goTo4:this.go(4), goTo5:this.go(5), goTo6:this.go(6), goTo7:this.go(7), goTo8:this.go(8),
+      tab0Style:this.tabStyle(0), tab1Style:this.tabStyle(1), tab2Style:this.tabStyle(2), tab3Style:this.tabStyle(3),
+      tab4Style:this.tabStyle(4), tab5Style:this.tabStyle(5), tab6Style:this.tabStyle(6), tab7Style:this.tabStyle(7), tab8Style:this.tabStyle(8),
+
+      d,
+      onName:this.field('name'), onCourse:this.field('course'),
+      onWarmup:this.field('warmupGuidance'),
+      clarityOptions: ['Opaque','Vague','Mixed','Mostly clear','Crystal clear'].map(label => ({ label, set:this.setClarity(label), style:this.clarityStyle(label) })),
+      // warm-up live post controls
+      onPost: () => this.liveSubmit(),
+      posting: s.posting, posted: s.posted, postError: s.postError,
+      setPostName: () => this.setState({ postAnon:false }), setPostAnon: () => this.setState({ postAnon:true }),
+      postNameStyle: this.postModeStyle(false), postAnonStyle: this.postModeStyle(true),
+      postNameText: d.name.trim() ? ('As ' + d.name.trim()) : 'With my name',
+      postLabel: s.posting ? 'Posting…' : (s.posted ? 'Posted ✓ — post again' : 'Share with the room'),
+      postDisabled: !canPost || s.posting,
+      postBtnStyle: `border:none;background:${canPost && !s.posting ? '#990000' : '#D8CFC0'};color:#fff;font-weight:700;font-size:14px;padding:10px 18px;border-radius:10px;cursor:${canPost && !s.posting ? 'pointer' : 'default'};`,
+      goLiveWall: this.go(8),
+      // live wall
+      live: {
+        configured: liveStatus === 'ready',
+        connecting: liveStatus === 'init',
+        unconfigured: liveStatus === 'unconfigured',
+        error: liveStatus === 'error',
+        errorMsg: (typeof window!=='undefined' && window.MTC_LIVE && window.MTC_LIVE.error) || '',
+        count: s.liveResponses.length, hasAny: s.liveResponses.length > 0,
+        empty: liveStatus === 'ready' && s.liveResponses.length === 0,
+        tally, cards, session: s.liveSession, onSession: e => this.changeSession(e.target.value),
+      },
+      onA1a:this.field('a1a'), onA1b:this.field('a1b'), onA2gap:this.field('a2gap'),
+      onMove1:this.field('move1'), onBy1:this.field('by1'), onMove2:this.field('move2'), onBy2:this.field('by2'),
+      onMove3:this.field('move3'), onBy3:this.field('by3'),
+      onMentor1:this.field('mentor1'), onMentor2:this.field('mentor2'),
+      onApName:this.field('apName'), onApContact:this.field('apContact'), onApCommit:this.field('apCommit'),
+
+      // activity 1
+      a1Words, a1HasContent: !!(d.a1a.trim()||d.a1b.trim()), a1Sentence:this.sentence(),
+      weakClaim:this.setWeak('Claim'), weakEvidence:this.setWeak('Evidence'), weakReasoning:this.setWeak('Reasoning'),
+      weakClaimStyle:this.weakStyle('Claim'), weakEvidenceStyle:this.weakStyle('Evidence'), weakReasoningStyle:this.weakStyle('Reasoning'),
+      fb1:{ get:()=>this.getFb('a1'), loading:s.fb.a1.loading, has:!!s.fb.a1.text, text:s.fb.a1.text },
+      fb2:{ get:()=>this.getFb('a2'), loading:s.fb.a2.loading, has:!!s.fb.a2.text, text:s.fb.a2.text },
+
+      // activity 2
+      rows, addRow:this.addRow,
+
+      // activity 3
+      ideas,
+
+      // take-home
+      checklist, checklistPct,
+
+      // timers
+      t1:this.timerObj('a1'), t2:this.timerObj('a2'), t3:this.timerObj('a3'),
+
+      // present
+      present:s.present, openPresent:this.openPresent, closePresent:this.closePresent,
+      presPrev:this.presStep(-1), presNext:this.presStep(1), pres:presD,
+
+      // skeleton
+      skeletonKicker: doneAll ? 'You built it' : 'Your working skeleton',
+      skeletonTitle: doneAll ? 'You have a portfolio skeleton.' : 'Your portfolio skeleton',
+      skeletonName: d.name.trim() || 'Workshop participant',
+      skeletonCourse: d.course.trim() ? (' · ' + d.course.trim()) : '',
+      skeletonDate: new Date().toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}),
+      skeletonSentence:this.sentence(), hasWeak:!!d.a1weak,
+      skeletonRows:skRows, hasRows:skRows.length>0, noRows:skRows.length===0,
+      hasGap:!!d.a2gap.trim(),
+      skeletonMoves:skMoves, hasMoves:skMoves.length>0, noMoves:skMoves.length===0,
+      hasMentors:mentors.length>0, skeletonMentors:mentors.join(' · '),
+      hasPartner:!!d.apName.trim(),
+      skeletonPartner: d.apName.trim() + (d.apContact.trim()?(' ('+d.apContact.trim()+')'):'') + (d.apCommit.trim()?(' — '+d.apCommit.trim()):''),
+
+      exportPrint:this.exportPrint, emailSelf:this.emailSelf, copyAll:this.copyAll,
+      copyLabel: s.copied ? 'Copied ✓' : 'Copy text',
+      restart:this.restart,
+    };
+  }
+}
+</script>
+</body>
+</html>
