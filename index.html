@@ -1018,6 +1018,19 @@ class Component extends DCLogic {
   }
 
   async getFb(which) {
+    // Don't spend a call on an empty draft — nudge them to write something first.
+    const d0 = this.state.data;
+    if (which === 'a1' && !d0.a1a.trim() && !d0.a1b.trim()) {
+      this.setState(s => ({ fb:{...s.fb, a1:{loading:false, text:'Write a rough phrase in the two blanks first — even a few words — then I’ll read your draft for claim, evidence, and reasoning.'}} }));
+      return;
+    }
+    if (which === 'a2') {
+      const anyRows = this.state.rows.some(r => r.item.trim() || r.criterion.trim());
+      if (!anyRows && !d0.a2gap.trim()) {
+        this.setState(s => ({ fb:{...s.fb, a2:{loading:false, text:'Map at least one evidence item (or name your biggest gap) first, then I’ll pressure-test it.'}} }));
+        return;
+      }
+    }
     this.setState(s => ({ fb:{...s.fb, [which]:{loading:true,text:''}} }));
     let prompt;
     if (which === 'a1') {

@@ -12,8 +12,8 @@ const ALLOWED_ORIGINS = new Set([
   "https://akesha.github.io", // GitHub Pages site that serves the workbook
 ]);
 
-// Short, encouraging coaching — Haiku is fast and cheap and plenty for this.
-const MODEL = "claude-haiku-4-5-20251001";
+// Coaching feedback — Sonnet for richer, more nuanced responses.
+const MODEL = "claude-sonnet-4-6";
 const MAX_TOKENS = 400;
 const MAX_PROMPT = 4000;
 
