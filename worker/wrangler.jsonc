@@ -1,0 +1,6 @@
+{
+  "name": "make-the-case-feedback",
+  "main": "src/index.js",
+  "compatibility_date": "2025-06-01",
+  "observability": { "enabled": true }
+}

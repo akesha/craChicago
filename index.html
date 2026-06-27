@@ -46,6 +46,15 @@
     messagingSenderId: "573672161273",
     appId: "1:573672161273:web:aee8bd1e9426893d4a4728"
   };
+
+  /* ══════════════════════════════════════════════════════════════════════
+     LIVE AI COACHING  ·  Cloudflare Worker proxy
+     URL of the deployed feedback Worker (see worker/README.md). When set, the
+     "Read my draft" and "Check my mapping" buttons work on the public site.
+     Leave blank to keep those buttons in self-review fallback mode.
+     ══════════════════════════════════════════════════════════════════════ */
+  window.MTC_FEEDBACK_URL = "";
+
   /* ════════════════════ no need to edit below this line ════════════════════ */
   window.MTC_LIVE = { status: "init", error: "" };
   const notify = () => window.dispatchEvent(new CustomEvent("mtc-live"));
@@ -1022,7 +1031,21 @@ class Component extends DCLogic {
       prompt = `You are a warm, sharp faculty-development coach for teaching-track CS faculty. Below is an instructor's evidence-to-criteria map and their stated biggest gap. Give brief, encouraging, concrete feedback (max 120 words, plain prose, no headings). Comment on: which item reads as the strongest piece of evidence, whether any item is mapped to a vague rather than a specific criterion, and one piece of evidence they likely overlook (e.g. TA mentoring, an OER assignment set, a workshop, a grant). Map:\n${list}\nBiggest gap: ${gap}`;
     }
     try {
-      const text = await window.claude.complete(prompt);
+      let text;
+      if (window.claude && typeof window.claude.complete === 'function') {
+        text = await window.claude.complete(prompt);
+      } else if (window.MTC_FEEDBACK_URL) {
+        const res = await fetch(window.MTC_FEEDBACK_URL, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ prompt }),
+        });
+        if (!res.ok) throw new Error('proxy ' + res.status);
+        const j = await res.json();
+        text = j.text || '';
+      } else {
+        throw new Error('no feedback backend configured');
+      }
       this.setState(s => ({ fb:{...s.fb, [which]:{loading:false, text: (text||'').trim()}} }));
     } catch(err) {
       this.setState(s => ({ fb:{...s.fb, [which]:{loading:false, text:'Live feedback is available when this runs in the workshop tool. For now, read your draft against the three parts yourself: is the claim clear, is the evidence something you could actually show, and does the reasoning connect them?'}} }));
