@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Instructional Reflection — Summary &amp; Facilitator Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f5efe4;
+      --paper-2: #ebe3d3;
+      --paper-edge: #ddd2bd;
+      --ink: #1f1b16;
+      --ink-2: #3d362d;
+      --ink-3: #6b5f50;
+      --ink-4: #9b8e7c;
+      --rule: #d4c8b1;
+      --rule-soft: #e3d9c4;
+      --accent: #7a3a1f;        /* iron oxide */
+      --accent-2: #4d5d3a;      /* moss */
+      --accent-3: #b88a3e;      /* ochre */
+      --flag: #a83d2a;
+      --flag-bg: #f3e0d6;
+      --serif: "Newsreader", "Source Serif 4", Georgia, serif;
+      --sans: "Inter Tight", "Helvetica Neue", system-ui, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--serif);
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: "kern", "liga", "onum";
+      line-height: 1.6;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(rgba(120,90,50,0.05) 1px, transparent 1px),
+        radial-gradient(rgba(120,90,50,0.03) 1px, transparent 1px);
+      background-size: 3px 3px, 7px 7px;
+      background-position: 0 0, 1px 2px;
+      opacity: 0.6;
+    }
+    .shell {
+      position: relative;
+      z-index: 1;
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 72px 48px 120px;
+    }
+    .eyebrow {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .stamp {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      padding: 5px 10px;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(40px, 5.6vw, 64px);
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      font-weight: 400;
+      margin: 18px 0 0;
+      text-wrap: pretty;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    h2 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 32px;
+      letter-spacing: -0.015em;
+      margin: 0 0 12px;
+      text-wrap: pretty;
+    }
+    h2 em { font-style: italic; color: var(--accent); }
+    h3 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 21px;
+      letter-spacing: -0.01em;
+      margin: 28px 0 8px;
+    }
+    h4 {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 12.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-2);
+      margin: 22px 0 6px;
+    }
+    p, li {
+      font-family: var(--serif);
+      font-size: 16px;
+      color: var(--ink);
+      text-wrap: pretty;
+    }
+    p { margin: 0 0 14px; max-width: 64ch; }
+    .lede {
+      font-size: 19px;
+      line-height: 1.5;
+      color: var(--ink-2);
+      margin: 22px 0 0;
+      max-width: 60ch;
+    }
+    .lede em { color: var(--accent); }
+    a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 0.04em; text-underline-offset: 3px; }
+
+    .divider {
+      border: 0;
+      border-top: 1px solid var(--rule);
+      margin: 56px 0 40px;
+    }
+    .divider.tight { margin: 32px 0 28px; }
+    .divider.dashed { border-top: 1px dashed var(--rule); }
+
+    section.block { margin-top: 36px; }
+
+    /* Protocol summary card */
+    .protocol-card {
+      background: var(--paper-2);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 26px 28px 22px;
+      margin: 26px 0;
+      position: relative;
+    }
+    .protocol-card .corner {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-family: var(--sans);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .protocol-card h3 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+    .protocol-card ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: pcounter;
+    }
+    .protocol-card ol li {
+      counter-increment: pcounter;
+      position: relative;
+      padding: 10px 0 10px 44px;
+      border-top: 1px solid var(--rule-soft);
+      font-family: var(--serif);
+      font-size: 15.5px;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+    .protocol-card ol li:first-child { border-top: none; }
+    .protocol-card ol li::before {
+      content: counter(pcounter, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 11px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+    .protocol-card ol li .sub {
+      display: block;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 13.5px;
+      color: var(--ink-3);
+      margin-top: 2px;
+    }
+
+    /* TOC */
+    .toc {
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 18px 0;
+      margin: 40px 0 8px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 32px;
+    }
+    .toc a {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: baseline;
+      font-family: var(--sans);
+      font-size: 13px;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+      text-decoration: none;
+      padding: 6px 0;
+      border-bottom: 1px dashed transparent;
+    }
+    .toc a:hover { border-bottom-color: var(--rule); color: var(--accent); }
+    .toc a .n {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--ink-3);
+      letter-spacing: 0.08em;
+    }
+
+    /* Step blocks for the facilitator script */
+    .step {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 18px;
+      margin: 22px 0;
+      padding-top: 22px;
+      border-top: 1px solid var(--rule-soft);
+    }
+    .step:first-of-type { border-top: none; padding-top: 0; }
+    .step .badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      padding-top: 4px;
+    }
+    .step h3 { margin: 0 0 4px; }
+    .step .meta {
+      font-family: var(--sans);
+      font-size: 11.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 10px;
+    }
+
+    /* Quote / script */
+    .say {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 16.5px;
+      line-height: 1.55;
+      color: var(--ink-2);
+      border-left: 2px solid var(--accent);
+      padding: 4px 0 4px 18px;
+      margin: 12px 0 16px;
+      max-width: 58ch;
+    }
+    .say::before {
+      content: "say ";
+      display: inline;
+      font-family: var(--sans);
+      font-style: normal;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-right: 8px;
+      vertical-align: 0.18em;
+    }
+
+    /* Watchfor flag boxes */
+    .watch {
+      background: var(--flag-bg);
+      border: 1px solid #e7c8b3;
+      border-radius: 4px;
+      padding: 12px 16px 10px;
+      margin: 14px 0;
+      max-width: 60ch;
+    }
+    .watch .label {
+      font-family: var(--sans);
+      font-size: 10.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--flag);
+      margin-bottom: 4px;
+    }
+    .watch p { margin: 0; font-size: 14.5px; color: var(--ink-2); }
+
+    .aside {
+      background: var(--paper-2);
+      border-left: 2px solid var(--accent-2);
+      padding: 14px 18px;
+      margin: 16px 0;
+      max-width: 60ch;
+    }
+    .aside .label {
+      font-family: var(--sans);
+      font-size: 10.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin-bottom: 4px;
+    }
+    .aside p { margin: 0; font-size: 14.5px; color: var(--ink-2); }
+
+    ul.clean, ol.clean {
+      padding-left: 20px;
+      margin: 8px 0 16px;
+    }
+    ul.clean li, ol.clean li {
+      margin-bottom: 6px;
+      font-size: 15.5px;
+      line-height: 1.55;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    @media (max-width: 720px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .toc { grid-template-columns: 1fr; }
+      .shell { padding: 40px 24px 80px; }
+      .step { grid-template-columns: 48px 1fr; gap: 12px; }
+    }
+
+    /* Tables */
+    table.timing {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--sans);
+      margin: 14px 0 20px;
+      font-size: 13.5px;
+    }
+    table.timing th, table.timing td {
+      text-align: left;
+      padding: 9px 12px 9px 0;
+      border-bottom: 1px solid var(--rule-soft);
+      vertical-align: top;
+    }
+    table.timing th {
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 10.5px;
+      color: var(--ink-3);
+    }
+    table.timing td:first-child {
+      font-family: var(--mono);
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      width: 96px;
+    }
+    table.timing td.activity { font-family: var(--serif); font-size: 15px; color: var(--ink); }
+    table.timing td.note { color: var(--ink-3); font-style: italic; font-family: var(--serif); font-size: 14px; }
+
+    .qualities {
+      list-style: none;
+      padding: 0;
+      margin: 14px 0 20px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .qualities li {
+      padding: 14px 14px 16px;
+      border-right: 1px solid var(--rule-soft);
+      font-family: var(--sans);
+    }
+    .qualities li:last-child { border-right: none; }
+    .qualities li .q {
+      font-family: var(--serif);
+      font-size: 17px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .qualities li .qsub {
+      font-size: 11.5px;
+      color: var(--ink-3);
+      line-height: 1.4;
+      font-family: var(--serif);
+      font-style: italic;
+    }
+    @media (max-width: 720px) {
+      .qualities { grid-template-columns: 1fr 1fr; }
+      .qualities li:nth-child(2n) { border-right: none; }
+      .qualities li { border-bottom: 1px solid var(--rule-soft); }
+    }
+
+    .footnote {
+      font-family: var(--sans);
+      font-size: 11.5px;
+      color: var(--ink-3);
+      letter-spacing: 0.02em;
+      max-width: 56ch;
+      margin-top: 72px;
+      padding-top: 22px;
+      border-top: 1px solid var(--rule);
+      line-height: 1.55;
+    }
+    .footnote em { color: var(--ink-2); }
+
+    .pull {
+      display: block;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 20px;
+      color: var(--accent);
+      border-left: 2px solid var(--accent);
+      padding: 6px 0 6px 18px;
+      margin: 18px 0;
+      max-width: 56ch;
+      line-height: 1.4;
+    }
+
+    .anchor { display: block; position: relative; top: -24px; visibility: hidden; }
+
+    @media print {
+      body::before { display: none; }
+      .toc { page-break-after: always; }
+      .step { page-break-inside: avoid; }
+      .protocol-card { page-break-inside: avoid; }
+      .shell { padding: 24px 32px; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+
+    <!-- ────────────── COVER ────────────── -->
+    <header>
+      <span class="stamp">Instructional Reflection · internal document</span>
+      <h1>What it is, and how to <em>run a faculty member</em> through it.</h1>
+      <p class="lede">
+        A one-page summary of the tool, followed by a facilitator's guide for sitting next to a colleague — or a room of them — and helping them turn the term they just taught into <em>signal they can use in July</em>.
+      </p>
+    </header>
+
+    <!-- ────────────── SUMMARY ────────────── -->
+    <section class="block">
+      <span class="anchor" id="summary"></span>
+      <p class="eyebrow">Part one · Summary</p>
+      <h2>The tool, in plain terms.</h2>
+
+      <p>
+        <strong>Instructional Reflection</strong> is an end-of-term protocol that helps an instructor in engineering, computer science, data science, informatics, or library science capture <em>specific, evidence-anchored observations</em> from the term they just taught — and turn them into a document they will actually re-open in July, when they have to make decisions about fall.
+      </p>
+
+      <p class="pull">
+        Without structured capture, you have no signal from this term. You only have mood.
+      </p>
+
+      <p>
+        It is built around one premise: faculty teaching tools fail when they sound like productivity tools. So the surface is quiet — cream paper, serif body, no streaks, no dashboards. The work is intellectual, not gamified. Each course gets <em>twenty minutes</em>, one document, and five prompts. Saves locally; nothing leaves the browser.
+      </p>
+
+      <h3>The protocol</h3>
+      <div class="protocol-card">
+        <span class="corner">Six steps · ~20 min per course</span>
+        <ol>
+          <li>
+            Canvas data review — before writing.
+            <span class="sub">Look at submission patterns, score distributions, engagement timing. Disconfirm memory.</span>
+          </li>
+          <li>
+            What worked, in concrete terms.
+            <span class="sub">Name the incident — the lab, the studio crit, the search log — not the semester.</span>
+          </li>
+          <li>
+            What broke, in concrete terms.
+            <span class="sub">Where students struggled in ways you did not predict.</span>
+          </li>
+          <li>
+            What surprised you.
+            <span class="sub">The data point you did not have a slot in your model for.</span>
+          </li>
+          <li>
+            One question this term left you with.
+            <span class="sub">Not ten. One. Ends with a question mark.</span>
+          </li>
+          <li>
+            One decision for next year.
+            <span class="sub">Reflection that does not produce a change is journaling. Closes the Korthagen loop.</span>
+          </li>
+        </ol>
+      </div>
+
+      <h3>The five qualities it scores for</h3>
+      <p>Each prompt's quality readout, and the July artifact, score against the same five bars — drawn from Schön, Brookfield, and Korthagen:</p>
+      <ul class="qualities">
+        <li>
+          <div class="q">Specific</div>
+          <div class="qsub">Names an incident, not a semester.</div>
+        </li>
+        <li>
+          <div class="q">Multi-lens</div>
+          <div class="qsub">Draws on more than your own view.</div>
+        </li>
+        <li>
+          <div class="q">Evidence-grounded</div>
+          <div class="qsub">References actual artifacts.</div>
+        </li>
+        <li>
+          <div class="q">Asks why</div>
+          <div class="qsub">Moves past description to design.</div>
+        </li>
+        <li>
+          <div class="q">Closes the loop</div>
+          <div class="qsub">Ends in a change you'd act on.</div>
+        </li>
+      </ul>
+
+      <h3>What sits around the reflection</h3>
+      <p>The shelf surfaces four <em>surrounding practices</em> — small artifacts that, accumulated across six years, become a stronger dossier than any single dossier-week effort.</p>
+
+      <div class="grid-2">
+        <div>
+          <h4>Annual · per academic year</h4>
+          <ul class="clean">
+            <li><strong>Response-to-feedback memo</strong> — what was raised, what you're taking up, what you're not, and <em>why</em>.</li>
+            <li><strong>Philosophy addendum</strong> — where your thinking shifted, where it was reinforced, what you'd defend more strongly now.</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Per cycle · or across terms</h4>
+          <ul class="clean">
+            <li><strong>Retrospective</strong> — every five terms: stop, commit, improving without you noticing.</li>
+            <li><strong>Trajectory</strong> — a data view of changes attempted and artifacts archived across terms.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>The optional SoTL layer</h3>
+      <p>
+        Each course has a <strong>Study</strong> tab — off by default. When toggled on for a course where the instructor is running an intervention they'd want to defend, it adds a methodological scaffold around the reflection: guiding question, study design, IRB posture, consent approach, target output venue, a <em>mid-term falsifier</em> named in advance, and an end-of-term claim with evidence, generalizability bounds, and the falsifier that would force a retraction.
+      </p>
+      <p>
+        Reflection ends in a <em>decision</em>. Scholarship ends in a <em>claim</em>. The Study tab is what turns the former into the latter — for one or two courses a year, not all of them.
+      </p>
+
+      <div class="aside">
+        <div class="label">Privacy posture</div>
+        <p>Everything saves to the instructor's browser (<span style="font-family:var(--mono); font-size:13px;">localStorage</span>). No account, no server. If embedded in Canvas, it is added as an External URL — nothing leaves the device. The facilitator should say this out loud at the top of any session.</p>
+      </div>
+    </section>
+
+    <hr class="divider"/>
+
+    <!-- ────────────── FACILITATOR GUIDE ────────────── -->
+    <section class="block">
+      <span class="anchor" id="guide"></span>
+      <p class="eyebrow">Part two · Facilitator guide</p>
+      <h2>How to <em>run someone</em> through it.</h2>
+      <p class="lede">
+        The tool implements the protocol; the writing is the instructor's. Your job, as facilitator, is not to write with them — it's to <em>keep them on signal and out of mood</em>, and to make sure they leave with a document they'll re-open in July.
+      </p>
+
+      <nav class="toc" aria-label="Sections">
+        <a href="#audience"><span class="n">A</span><span>Who this is for, and who it isn't</span></a>
+        <a href="#before"><span class="n">B</span><span>Before the session</span></a>
+        <a href="#arc"><span class="n">C</span><span>The arc of a session</span></a>
+        <a href="#walkthrough"><span class="n">D</span><span>Walking through one course</span></a>
+        <a href="#coaching"><span class="n">E</span><span>Coaching the prompts</span></a>
+        <a href="#pitfalls"><span class="n">F</span><span>Common pitfalls — and how to name them</span></a>
+        <a href="#after"><span class="n">G</span><span>After the session</span></a>
+        <a href="#sotl"><span class="n">H</span><span>When to mention SoTL</span></a>
+      </nav>
+
+      <!-- A · Audience -->
+      <h3 style="margin-top:40px;"><span class="anchor" id="audience"></span>A · Who this is for, and who it isn't.</h3>
+      <p>
+        Built for instructors in <strong>engineering, computer science, data science, informatics, and library science</strong>. The prompt examples reference studio crits, autograders, leakage in ML projects, search logs, relevance judgments, and Boolean evaluation — that specificity is the cue that the tool was made for these faculty.
+      </p>
+      <p>
+        It will <em>work</em> for humanities or social-science faculty, but the examples will feel borrowed. If you're facilitating outside the target disciplines, say so up front and tell them to translate.
+      </p>
+
+      <!-- B · Before -->
+      <h3><span class="anchor" id="before"></span>B · Before the session.</h3>
+
+      <h4>Ask the instructor to arrive with</h4>
+      <ul class="clean">
+        <li>Their Canvas (or LMS) gradebook open in another tab — for Section 00.</li>
+        <li>Any mid-semester surveys, end-of-term evaluations, or TA debrief notes.</li>
+        <li>For CS / data science instructors: autograder failure traces, commit-message patterns, notebook revision histories — even just a feel for where the autograder kept rewarding the wrong thing.</li>
+        <li>For information / library faculty: search-log audits, the reference-desk question log if there is one.</li>
+        <li>For engineering instructors: studio-crit transcripts or photos, design-review notes.</li>
+        <li>One course in mind. Just one to start.</li>
+      </ul>
+
+      <h4>Open the tool yourself first</h4>
+      <ul class="clean">
+        <li>From the Tweaks panel, <strong>Load sample courses</strong> so you can demo the shelf without entering anyone's real courses.</li>
+        <li>Confirm the term picker reads the right term.</li>
+        <li>Confirm the timer, examples, and concreteness check are <strong>on</strong>. Toggle the AI second-read on if the cohort is comfortable with it; off if it would be a distraction.</li>
+        <li>Reset (Tweaks → Wipe local data) before handing the device or screen to the instructor.</li>
+      </ul>
+
+      <div class="aside">
+        <div class="label">If you're facilitating a group</div>
+        <p>One device per instructor. Everything is local-only — there is no shared session. Your role becomes a metronome: keep the room paced, surface the prompts on a shared screen, and read out the coaching language. The writing is silent.</p>
+      </div>
+
+      <!-- C · Arc -->
+      <h3><span class="anchor" id="arc"></span>C · The arc of a session.</h3>
+
+      <p>Plan for <strong>90 minutes</strong> if the instructor is doing one course, <strong>two hours</strong> for two, with breaks. Anyone trying to do four courses in one sitting is no longer reflecting; they are surviving. Send them home.</p>
+
+      <table class="timing">
+        <thead>
+          <tr><th>Time</th><th>What happens</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>0:00 — 0:05</td><td class="activity">Framing: privacy, the five qualities, the twenty-minute rule.</td><td class="note">Read the Cover aloud if needed.</td></tr>
+          <tr><td>0:05 — 0:10</td><td class="activity">Add the first course to the shelf.</td><td class="note">Course code, name, section, enrollment.</td></tr>
+          <tr><td>0:10 — 0:18</td><td class="activity">Section 00 · Data review.</td><td class="note">LMS data in another tab. Acknowledge caveats.</td></tr>
+          <tr><td>0:18 — 0:42</td><td class="activity">Prompts 1 — 5. About four minutes each, with lens + evidence nudges.</td><td class="note">Twenty-minute timer runs.</td></tr>
+          <tr><td>0:42 — 0:50</td><td class="activity">Open the artifact view. Read it through once.</td><td class="note">First time they see all five answers stitched.</td></tr>
+          <tr><td>0:50 — 1:05</td><td class="activity">Break, or: second course.</td><td class="note">Stand up. Don't write through.</td></tr>
+          <tr><td>1:05 — 1:25</td><td class="activity">If time: log changes attempted (What I tried) + archive 1–2 artifacts.</td><td class="note">5–10 minutes total. Not the focus.</td></tr>
+          <tr><td>1:25 — 1:30</td><td class="activity">Close-out. Where they save the artifact. When they re-read it.</td><td class="note">Calendar a re-read for the second week of July.</td></tr>
+        </tbody>
+      </table>
+
+      <!-- D · Walkthrough -->
+      <h3><span class="anchor" id="walkthrough"></span>D · Walking through one course.</h3>
+
+      <div class="step">
+        <div class="badge">00</div>
+        <div>
+          <h3>Section 00 — the data review.</h3>
+          <div class="meta">~8 minutes · before any writing</div>
+          <p>
+            This is the most-skipped step and the most important. The point is to <em>disconfirm memory</em> before they start writing about what they think happened. Have them open the LMS and look at three specific things:
+          </p>
+          <ul class="clean">
+            <li><strong>Submission patterns</strong> — which assignments had a long tail of late or missing work? Where did the cohort cluster on time?</li>
+            <li><strong>Score distributions</strong> — where is the bimodal? Where is the ceiling effect? Where did everyone get the same grade for different reasons?</li>
+            <li><strong>Engagement timing</strong> — discussion-board posts, lab attendance, office-hour logs, page-views on key resources. When did the cohort show up and when did they vanish?</li>
+          </ul>
+          <p class="say">Don't write anything yet. Just look. The point is to find at least one thing that contradicts what you'd have said if I'd asked you in the hallway.</p>
+          <p>
+            They <em>must</em> tick the "I've reviewed and acknowledge what the data is and isn't" caveat before the tool advances. Don't rush them past it. If they're stuck, the three checkboxes are a fallback — even ticking those three is more than most reflection does.
+          </p>
+          <div class="watch">
+            <div class="label">Watch for</div>
+            <p>The instructor opens the LMS and immediately starts <em>writing</em> in the prompts. Stop them. The data review is a <em>looking</em> step, not a writing step.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="badge">01–05</div>
+        <div>
+          <h3>The five prompts.</h3>
+          <div class="meta">~4 minutes each · twenty minutes total</div>
+          <p>
+            Each prompt has the same structure: a title, an italic instruction, a <em>useful vs. useless</em> example pair (collapsed by default — tell them to open it if they get stuck), a textarea, and below it, three follow-ups that appear after 15 words: lens chips, an evidence slot, and a one-line "why" nudge.
+          </p>
+          <p class="say">Start typing. Don't aim for the right answer. Aim for the specific one. The lens chips and the evidence slot will show up below — leave them for now. You'll get to them.</p>
+          <p>The concreteness check will flag hedge phrases — <em>didn't land · seemed engaged · went well · overall · vibe</em> — in a side panel. Tell them up front:</p>
+          <p class="say">Those flags aren't gates. They're a mirror. If you wrote "didn't land," the tool will ask you what specifically fell short. You can ignore it. But the question is usually worth answering.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="badge">06</div>
+        <div>
+          <h3>Lenses and evidence — after each answer.</h3>
+          <div class="meta">~30 seconds per prompt · do not skip</div>
+          <p>
+            Once an answer is past 15 words, four lens chips appear: <em>Your own · Students' · A colleague's · Literature</em>. Hover gives a definition and a concrete example for each. The default for most faculty is to tag <strong>only their own</strong>, which is also the default in unstructured reflection — and the reason it stays thin.
+          </p>
+          <p class="say">Click only the lenses you actually drew on for this answer. Don't aspire. If you only used your own view, leave it at one chip. If a TA mentioned something that shaped what you wrote, tag the colleague lens. Even one beyond your own sharpens the read.</p>
+          <p>
+            The evidence slot is collapsed by default. Ask them to expand it and write a one-line pointer — <em>"week 7 studio crit photos in the shared drive"</em>, <em>"DATA 220 final-project leaderboard CSV"</em>, <em>"LIS 510 mid-semester survey, question 3"</em>. The point isn't a citation. It's that future-them, reading in July, knows where to go look.
+          </p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="badge">07</div>
+        <div>
+          <h3>Closing the loop — Prompt 5.</h3>
+          <div class="meta">~5 minutes · this is the one that matters</div>
+          <p>
+            Prompts 1–4 produce signal. Prompt 5 is what makes the document <em>worth re-opening in July</em>. Don't let them write a list. The prompt asks for <em>one</em> decision — specific enough that future-them could explain it to a colleague before September.
+          </p>
+          <p class="say">Read your answer to question 4 again. Now: what is the one change you'd make to this course next year because of that question? Not three. One. Specific enough that you'd know exactly what to change.</p>
+          <div class="watch">
+            <div class="label">Watch for</div>
+            <p>The instructor writes <em>"rework the final project"</em> or <em>"be clearer about LLM policies in the syllabus."</em> Both are aspirations, not decisions. Ask: <em>What would the new final project look like? What sentence would be in the syllabus?</em> The answer they give out loud — write that down.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="badge">08</div>
+        <div>
+          <h3>The artifact view.</h3>
+          <div class="meta">~5 minutes · first read-through</div>
+          <p>
+            On close-out the tool opens the July artifact: their five answers stitched into a single document, with the five-quality scoring panel at the bottom. This is the first time they see the term as a single readable piece.
+          </p>
+          <p>
+            Have them read it through, out loud if they're comfortable. Look for the gaps — a prompt with no lenses tagged, an answer with no evidence pointer, a "decision" that reads like an aspiration. The scoring panel makes these visible without you having to point at them.
+          </p>
+          <p class="say">Print it, or save the page as a PDF, and put it where you'll find it. Name it after the course and the term. Calendar a re-read for the second week of July.</p>
+        </div>
+      </div>
+
+      <!-- E · Coaching -->
+      <h3><span class="anchor" id="coaching"></span>E · Coaching the prompts.</h3>
+
+      <p>The single most useful intervention a facilitator can make is to ask <em>"what specifically?"</em> at the right moments. The prompts are written to invite specificity; the work is keeping the writer on it.</p>
+
+      <h4>On "What worked"</h4>
+      <p class="say">Don't tell me the course went well. Tell me the assignment, the moment, or the question a student asked. Which design choice in the assignment produced that response?</p>
+
+      <h4>On "What broke"</h4>
+      <p class="say">Tell me the thing you would not have predicted in week one. Where did the autograder reward the wrong thing? Where did the assignment stop measuring what you thought it measured?</p>
+
+      <h4>On "What surprised you"</h4>
+      <p class="say">What does this surprise contradict in your prior model of how the course works? If nothing contradicts, it isn't a surprise — it's a confirmation. Try again.</p>
+
+      <h4>On "One question"</h4>
+      <p class="say">One sentence. Ends with a question mark. Not the obvious question. The one you'd still be carrying at the end of August.</p>
+
+      <h4>On "One decision"</h4>
+      <p class="say">What would have to be true in week one of next term for this change to actually take? If you can't answer that, the decision isn't specific enough yet.</p>
+
+      <!-- F · Pitfalls -->
+      <h3><span class="anchor" id="pitfalls"></span>F · Common pitfalls — and how to name them.</h3>
+
+      <div class="watch">
+        <div class="label">Pitfall · Mood, not signal</div>
+        <p>"It was a tough semester." / "The energy was off." / "Students just weren't engaged." Treat as a tell. Ask: <em>name one moment. What did they do, not how it felt.</em></p>
+      </div>
+
+      <div class="watch">
+        <div class="label">Pitfall · The semester, not the incident</div>
+        <p>"Overall, lab sections went well." Ask: <em>which lab, which week, which question someone asked?</em> The unit of reflection is the incident.</p>
+      </div>
+
+      <div class="watch">
+        <div class="label">Pitfall · The aspiration, not the decision</div>
+        <p>"I want to be clearer about AI policy." Ask: <em>what sentence will be in the syllabus on day one?</em></p>
+      </div>
+
+      <div class="watch">
+        <div class="label">Pitfall · One-lens reflection</div>
+        <p>All five prompts tagged with only "Your own." Ask: <em>did any student question, TA comment, or peer observation actually shape what you wrote here? If yes, tag it. If no, leave it — and notice that pattern.</em></p>
+      </div>
+
+      <div class="watch">
+        <div class="label">Pitfall · The list-of-ten question</div>
+        <p>Prompt 4 comes back with six questions. Ask: <em>which one would you still be carrying at the end of August if you wrote down none of them?</em> Cut the rest.</p>
+      </div>
+
+      <div class="watch">
+        <div class="label">Pitfall · The artifact as a performance</div>
+        <p>The instructor writes for an imagined dean or P&amp;T committee. The document gets stiff, and the signal disappears. Remind them: <em>the audience is future-you, in July, with a calendar to plan. Nobody else.</em></p>
+      </div>
+
+      <!-- G · After -->
+      <h3><span class="anchor" id="after"></span>G · After the session.</h3>
+
+      <h4>Immediately</h4>
+      <ul class="clean">
+        <li>Confirm the artifact saved (the topbar pill should read <em>saved</em>).</li>
+        <li>Have them print to PDF and stash a copy somewhere outside the browser — Drive, Box, a folder. The localStorage copy is convenient, not durable.</li>
+        <li>Calendar a re-read for the second week of July, before they touch fall syllabi.</li>
+      </ul>
+
+      <h4>Across the term cycle</h4>
+      <ul class="clean">
+        <li>When they make a change they wrote down in Prompt 5, have them log it in <strong>What I tried</strong> (the workspace tab) — with the change, the why, and eventually the outcome.</li>
+        <li>When they create or revise an artifact (rubric, assignment brief, lab manual), archive it in <strong>Artifact archive</strong> with a one-line annotation. Future-them, building a dossier, will thank present-them.</li>
+      </ul>
+
+      <h4>Once a year, in May or June</h4>
+      <ul class="clean">
+        <li><strong>Response-to-feedback memo</strong> — 30 minutes. Four fields. What was raised in evaluations, what you're taking up, what you're not, and the reasoning. The reasoning is the field that earns credibility; do not skip it.</li>
+        <li><strong>Philosophy addendum</strong> — 30 minutes. Three fields. Where your thinking shifted, where it was reinforced, what you'd defend more strongly now. Stacks year-on-year for dossier assembly.</li>
+      </ul>
+
+      <h4>Every five terms</h4>
+      <ul class="clean">
+        <li><strong>Retrospective</strong> — an hour. Three fields. What to stop. What to commit to. Where you're improving without noticing. The tool surfaces all the prior-term "decision" answers above the form so you can read them as a body.</li>
+      </ul>
+
+      <h4>When building a dossier</h4>
+      <ul class="clean">
+        <li><strong>Trajectory</strong> — not an entry surface. A data view across terms: reflection completion, changes attempted, artifacts archived. Walks the reviewer through the accumulation.</li>
+      </ul>
+
+      <!-- H · SoTL -->
+      <h3><span class="anchor" id="sotl"></span>H · When to mention SoTL.</h3>
+
+      <p>
+        Don't introduce the Study tab in a first session. Most instructors will never need it for most courses, and surfacing it too early dilutes the reflection-ends-in-a-decision frame that makes the core tool work.
+      </p>
+
+      <p>Bring it up only when:</p>
+      <ul class="clean">
+        <li>The instructor describes an actual intervention they're running — <em>"I'm trying a new feedback protocol in DATA 220 this fall"</em>, <em>"I redesigned the search-strategy unit and I want to know if it travels."</em></li>
+        <li>The instructor has a venue in mind — a workshop, a CSEd paper, a teaching-and-learning showcase, an ACRL session, an internal teaching innovation grant.</li>
+        <li>They are willing to <em>name a falsifier before week one</em>. This is the diagnostic question. If the answer is no, the Study tab will produce a worse artifact than the regular reflection.</li>
+      </ul>
+
+      <p class="say">If you want this course's reflection to travel as scholarship — if you could see yourself writing it up — turn the Study tab on for this course only. The protocol gets a methodological scaffold around it: a guiding question written before week one, a study design, an IRB posture, a mid-term falsifier, and at the end, a claim with evidence and bounds. Otherwise, leave it off. The reflection works as a complete tool without it.</p>
+
+      <div class="aside">
+        <div class="label">Where to send them</div>
+        <p>If a SoTL claim is the goal, point the instructor at their unit's teaching-and-learning center for IRB guidance early — not at the end. The single most common SoTL failure mode is "I started collecting data and then realized I needed IRB."</p>
+      </div>
+    </section>
+
+    <p class="footnote">
+      A companion document to <em>Instructional Reflection</em>. The tool implements the protocol; the writing is the instructor's; the facilitation, where it happens, is what makes a twenty-minute session land. Concreteness checks are nudges, not gates — and so is this guide.
+    </p>
+
+  </main>
+</body>
+</html>

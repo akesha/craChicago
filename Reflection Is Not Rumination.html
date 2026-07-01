@@ -1,0 +1,1551 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reflection Is Not Rumination — on what we lose between May and August</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400;1,6..72,500&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f5efe4;
+      --paper-2: #ebe3d3;
+      --paper-edge: #ddd2bd;
+      --ink: #1f1b16;
+      --ink-2: #3d362d;
+      --ink-3: #6b5f50;
+      --ink-4: #9b8e7c;
+      --rule: #d4c8b1;
+      --rule-soft: #e3d9c4;
+      --accent: #7a3a1f;
+      --accent-2: #4d5d3a;
+      --accent-3: #b88a3e;
+      --flag: #a83d2a;
+      --flag-bg: #f3e0d6;
+      --serif: "Newsreader", "Source Serif 4", Georgia, serif;
+      --sans: "Inter Tight", system-ui, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--serif);
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: "kern", "liga", "onum";
+      line-height: 1.62;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(rgba(120,90,50,0.05) 1px, transparent 1px),
+        radial-gradient(rgba(120,90,50,0.03) 1px, transparent 1px);
+      background-size: 3px 3px, 7px 7px;
+      background-position: 0 0, 1px 2px;
+      opacity: 0.6;
+    }
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 80px 56px 120px;
+    }
+    @media (max-width: 720px) {
+      .page { padding: 48px 22px 80px; }
+    }
+
+    /* ── Masthead ── */
+    .mast {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 56px;
+    }
+    .mast .pub {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-2);
+    }
+    .mast .pub em { color: var(--accent); font-style: italic; }
+    .mast .date {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--ink-3);
+      text-transform: uppercase;
+    }
+
+    /* ── Hero ── */
+    .eyebrow {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 22px;
+    }
+    h1.title {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(40px, 5.4vw, 64px);
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      margin: 0 0 18px;
+      text-wrap: balance;
+    }
+    h1.title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .dek {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 21px;
+      line-height: 1.42;
+      color: var(--ink-2);
+      max-width: 56ch;
+      margin: 0 0 38px;
+      text-wrap: pretty;
+    }
+    .byline {
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: var(--ink-3);
+      margin-bottom: 48px;
+    }
+    .byline .name { color: var(--ink); font-weight: 500; }
+    .byline .dot { margin: 0 8px; color: var(--ink-4); }
+    .byline em { font-family: var(--serif); font-style: italic; }
+
+    /* ── Body ── */
+    p, li {
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.65;
+      color: var(--ink);
+      text-wrap: pretty;
+    }
+    p {
+      margin: 0 0 22px;
+      max-width: 60ch;
+    }
+    p.lede {
+      font-size: 20px;
+      color: var(--ink-2);
+      line-height: 1.55;
+    }
+    em { font-style: italic; }
+    strong { font-weight: 600; color: var(--ink); }
+
+    h2 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 26px;
+      letter-spacing: -0.015em;
+      margin: 64px 0 18px;
+      text-wrap: balance;
+    }
+    h2 em { font-style: italic; color: var(--accent); }
+    h2 .nm {
+      display: block;
+      font-family: var(--sans);
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 8px;
+    }
+
+    /* drop cap */
+    .first p:first-of-type::first-letter {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-style: italic;
+      color: var(--accent);
+      float: left;
+      font-size: 74px;
+      line-height: 0.86;
+      padding: 6px 10px 0 0;
+      margin-top: 4px;
+    }
+
+    /* pull quote */
+    .pull {
+      display: block;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 26px;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      color: var(--accent);
+      padding: 6px 0 6px 22px;
+      border-left: 2px solid var(--accent);
+      margin: 36px 0;
+      max-width: 54ch;
+      text-wrap: balance;
+    }
+
+    /* inline block quote */
+    blockquote {
+      margin: 28px 0;
+      padding: 0 0 0 22px;
+      border-left: 1px solid var(--rule);
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--ink-2);
+      max-width: 56ch;
+    }
+    blockquote p { font-size: 17px; line-height: 1.55; }
+    blockquote cite {
+      display: block;
+      font-style: normal;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-top: 8px;
+    }
+
+    /* small enumerated list */
+    ol.numbered {
+      list-style: none;
+      padding: 0;
+      margin: 24px 0 30px;
+      counter-reset: l;
+    }
+    ol.numbered li {
+      counter-increment: l;
+      position: relative;
+      padding: 12px 0 12px 56px;
+      border-top: 1px solid var(--rule-soft);
+      max-width: 60ch;
+      font-size: 17.5px;
+    }
+    ol.numbered li:first-child { border-top: 1px solid var(--rule); }
+    ol.numbered li:last-child { border-bottom: 1px solid var(--rule); }
+    ol.numbered li::before {
+      content: counter(l, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+    }
+    ol.numbered li .term {
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 500;
+      color: var(--ink);
+      margin-right: 6px;
+    }
+    ol.numbered li .gloss {
+      color: var(--ink-2);
+    }
+
+    /* fragment / aside */
+    .aside {
+      background: var(--paper-2);
+      border-left: 2px solid var(--accent-2);
+      padding: 16px 22px;
+      margin: 28px 0;
+      max-width: 60ch;
+    }
+    .aside .label {
+      font-family: var(--sans);
+      font-size: 10.5px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin-bottom: 6px;
+    }
+    .aside p {
+      margin: 0;
+      font-size: 16px;
+      color: var(--ink-2);
+      font-style: italic;
+    }
+
+    /* section divider — section break ornament */
+    .ornament {
+      text-align: center;
+      font-family: var(--serif);
+      font-size: 18px;
+      color: var(--ink-4);
+      letter-spacing: 0.6em;
+      margin: 56px 0;
+    }
+
+    /* CTA card */
+    .cta {
+      margin: 72px 0 24px;
+      padding: 32px 32px 30px;
+      background: var(--paper-2);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      max-width: none;
+      position: relative;
+    }
+    .cta .corner {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      font-family: var(--sans);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .cta h3 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+      margin: 0 0 8px;
+    }
+    .cta h3 em { font-style: italic; color: var(--accent); }
+    .cta p {
+      font-size: 16.5px;
+      color: var(--ink-2);
+      max-width: 56ch;
+      margin: 0 0 18px;
+    }
+    .cta a.btn {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--paper);
+      background: var(--ink);
+      padding: 10px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+    }
+    .cta a.btn:hover { background: var(--accent); }
+    .cta a.btn .arrow { font-family: var(--serif); font-style: italic; }
+    .cta .also {
+      margin-left: 16px;
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: var(--ink-3);
+    }
+    .cta .also a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule); }
+    .cta .also a:hover { color: var(--accent); }
+
+    /* About + footer */
+    .about {
+      margin-top: 56px;
+      padding: 22px 0 0;
+      border-top: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 18px;
+      max-width: 60ch;
+    }
+    .about .mono {
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--rule);
+      background: var(--paper-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 28px;
+      color: var(--accent);
+    }
+    .about p {
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--ink-3);
+      margin: 0;
+    }
+    .about p .name {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 15px;
+      color: var(--ink);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .endnote {
+      margin-top: 38px;
+      font-family: var(--sans);
+      font-size: 11.5px;
+      color: var(--ink-3);
+      letter-spacing: 0.02em;
+      max-width: 56ch;
+      line-height: 1.6;
+    }
+    .endnote em { color: var(--ink-2); font-style: italic; }
+    .endnote a { color: var(--ink-2); }
+
+    a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 0.04em; text-underline-offset: 3px; }
+
+    .small-caps {
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+
+    @media print {
+      body::before { display: none; }
+      .cta { display: none; }
+    }
+
+    /* ────────────────────────────────────────────────────────────────────
+       FIGURES — inline UI mockups (act as "screenshots")
+       Each figure is full-bleed within a wider container that escapes
+       the body's 60ch column. Window chrome wraps an authentic recreation
+       of the app's surface.
+       ──────────────────────────────────────────────────────────────────── */
+    figure.shot {
+      margin: 44px -80px 36px;
+      max-width: none;
+    }
+    @media (max-width: 920px) {
+      figure.shot { margin-left: 0; margin-right: 0; }
+    }
+    figure.shot .window {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      box-shadow: 0 1px 0 rgba(60,40,20,0.04), 0 10px 30px -18px rgba(60,40,20,0.18);
+      overflow: hidden;
+    }
+    figure.shot .chrome {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      background: var(--paper-2);
+      border-bottom: 1px solid var(--rule);
+    }
+    figure.shot .chrome .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--rule);
+    }
+    figure.shot .chrome .url {
+      flex: 1;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--ink-3);
+      letter-spacing: 0.04em;
+    }
+    figure.shot .canvas {
+      padding: 0;
+    }
+    figure.shot figcaption {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--ink-3);
+      letter-spacing: 0.02em;
+      margin-top: 14px;
+      text-align: center;
+      max-width: 60ch;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    figure.shot figcaption em { color: var(--ink-2); font-style: italic; }
+    figure.shot figcaption .fignum {
+      font-family: var(--sans);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-right: 10px;
+    }
+
+    /* ── Mini topbar (shared) ── */
+    .ui-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 22px;
+      border-bottom: 1px solid var(--rule);
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--ink-3);
+    }
+    .ui-topbar .mark {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--ink);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    .ui-topbar .mark .glyph {
+      width: 18px; height: 18px;
+      border: 1px solid var(--ink);
+      border-radius: 2px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-style: italic; font-size: 12px;
+      background: var(--paper-2);
+    }
+    .ui-topbar .save {
+      display: inline-flex; gap: 6px; align-items: center;
+    }
+    .ui-topbar .save .dotpip {
+      width: 5px; height: 5px; border-radius: 50%; background: var(--accent-2);
+    }
+
+    /* ── A · Workspace shot ── */
+    .ws-shell {
+      display: grid;
+      grid-template-columns: 200px 1fr 240px;
+      gap: 32px;
+      padding: 26px 28px 30px;
+    }
+    .ws-side {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--ink-3);
+    }
+    .ws-side .crumb {
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 10px;
+    }
+    .ws-side .doc-label {
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      margin-bottom: 4px;
+    }
+    .ws-side .doc-name {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 16px;
+      line-height: 1.3;
+      color: var(--ink);
+      border-bottom: 1px dashed transparent;
+      margin-bottom: 22px;
+    }
+    .ws-side .promptlist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .ws-side .promptlist li {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 6px;
+      padding: 7px 0;
+      font-family: var(--serif);
+      font-size: 14.5px;
+      color: var(--ink-3);
+      border-top: 1px solid var(--rule-soft);
+    }
+    .ws-side .promptlist li:first-child { border-top: none; }
+    .ws-side .promptlist li .n {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ink-4);
+      letter-spacing: 0.06em;
+      padding-top: 3px;
+    }
+    .ws-side .promptlist li.done { color: var(--ink); }
+    .ws-side .promptlist li.done .n { color: var(--accent-2); }
+    .ws-side .promptlist li.cur { color: var(--ink); font-weight: 500; }
+    .ws-side .promptlist li.cur .n { color: var(--accent); }
+    .ws-side .timer {
+      margin-top: 22px;
+      padding: 10px 0;
+      border-top: 1px solid var(--rule-soft);
+      border-bottom: 1px solid var(--rule-soft);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      display: flex; justify-content: space-between;
+    }
+    .ws-side .timer .lbl { color: var(--ink-3); font-family: var(--sans); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
+
+    .ws-main { min-width: 0; }
+    .ws-main .step {
+      font-family: var(--sans);
+      font-size: 10.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 6px;
+    }
+    .ws-main h3.prompt {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 26px;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      margin: 0 0 10px;
+      max-width: none;
+    }
+    .ws-main h3.prompt em { font-style: italic; color: var(--accent); }
+    .ws-main .instr {
+      font-family: var(--serif);
+      font-size: 14.5px;
+      color: var(--ink-2);
+      line-height: 1.45;
+      margin: 0 0 16px;
+      max-width: none;
+    }
+    .ws-main .editor-mock {
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      background: linear-gradient(transparent, var(--flag-bg) 60%, transparent);
+      padding: 16px 0 18px;
+      font-family: var(--serif);
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--ink);
+      max-width: none;
+    }
+    .hedge {
+      background: linear-gradient(180deg, transparent 60%, rgba(168,61,42,0.22) 0);
+      padding-bottom: 1px;
+      color: var(--ink);
+    }
+    .editor-foot {
+      display: flex; justify-content: space-between;
+      font-family: var(--sans); font-size: 11px; color: var(--ink-3);
+      margin-top: 10px;
+    }
+    .editor-foot .wc .num { color: var(--accent-3); font-weight: 500; }
+    .flags-mock {
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: var(--flag-bg);
+      border-left: 2px solid var(--flag);
+      font-family: var(--serif);
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--ink-2);
+      max-width: none;
+    }
+    .flags-mock .flag-label {
+      font-family: var(--sans);
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--flag);
+      margin-bottom: 4px;
+    }
+    .flags-mock ul {
+      list-style: none; padding: 0; margin: 0;
+    }
+    .flags-mock ul li {
+      padding: 3px 0;
+      font-size: 13.5px;
+      font-style: italic;
+      max-width: none;
+    }
+    .flags-mock ul li .quoted {
+      font-style: normal;
+      font-weight: 500;
+      color: var(--ink);
+      margin-right: 4px;
+    }
+
+    .ws-rail {
+      font-family: var(--sans);
+      font-size: 11px;
+    }
+    .ws-rail .heading {
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+    .ws-rail ul.qmini {
+      list-style: none; padding: 0; margin: 0;
+    }
+    .ws-rail ul.qmini li {
+      font-family: var(--serif);
+      font-size: 13.5px;
+      color: var(--ink-3);
+      padding: 6px 0 6px 22px;
+      position: relative;
+      max-width: none;
+    }
+    .ws-rail ul.qmini li::before {
+      content: "○";
+      position: absolute; left: 0; top: 6px;
+      font-size: 13px;
+      color: var(--ink-4);
+    }
+    .ws-rail ul.qmini li.met { color: var(--ink); }
+    .ws-rail ul.qmini li.met::before { content: "●"; color: var(--accent-2); }
+    .ws-rail ul.qmini li.miss { color: var(--ink-2); }
+    .ws-rail ul.qmini li.miss::before { content: "✕"; color: var(--flag); font-size: 10px; top: 8px; }
+
+    /* ── B · Scorecard ── */
+    .scorecard {
+      background: var(--paper);
+      padding: 22px 28px 26px;
+    }
+    .scorecard .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+    .scorecard .head .title {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 17px;
+      color: var(--ink);
+    }
+    .scorecard .head .score {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--flag);
+      text-transform: uppercase;
+    }
+    .scorecard .head .score .big {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 22px;
+      color: var(--flag);
+      margin-right: 4px;
+      letter-spacing: 0;
+    }
+    .scorecard .quote-row {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--ink-2);
+      font-size: 14.5px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+      padding: 10px 14px;
+      border-left: 1px solid var(--rule);
+      background: var(--paper-2);
+      max-width: none;
+    }
+    .scorecard .qrows {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      border-top: 1px solid var(--rule-soft);
+      border-bottom: 1px solid var(--rule-soft);
+    }
+    .scorecard .qrows .q {
+      padding: 14px 14px 16px;
+      border-right: 1px solid var(--rule-soft);
+      font-family: var(--sans);
+      position: relative;
+    }
+    .scorecard .qrows .q:last-child { border-right: none; }
+    .scorecard .qrows .q .qname {
+      font-family: var(--serif);
+      font-size: 15px;
+      color: var(--ink);
+      margin-bottom: 3px;
+    }
+    .scorecard .qrows .q .qsub {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 11.5px;
+      color: var(--ink-3);
+      line-height: 1.4;
+    }
+    .scorecard .qrows .q .qmark {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 18px;
+      color: var(--flag);
+    }
+    .scorecard .qrows .q .qmark.met { color: var(--accent-2); }
+    .scorecard .verdict {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 13.5px;
+      color: var(--flag);
+      margin-top: 14px;
+      text-align: right;
+      max-width: none;
+    }
+    @media (max-width: 720px) {
+      .scorecard .qrows { grid-template-columns: 1fr 1fr; }
+      .scorecard .qrows .q:nth-child(2n) { border-right: none; }
+      .scorecard .qrows .q { border-bottom: 1px solid var(--rule-soft); }
+    }
+
+    /* ── C · Shelf ── */
+    .shelf-shell {
+      padding: 28px 32px 30px;
+    }
+    .shelf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 4px;
+    }
+    .shelf-header h3 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 28px;
+      letter-spacing: -0.015em;
+      margin: 4px 0 0;
+      max-width: none;
+    }
+    .shelf-header .eb {
+      font-family: var(--sans);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .shelf-header .right {
+      text-align: right;
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--ink-3);
+    }
+    .shelf-header .right .term {
+      font-size: 10.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      border-bottom: 1px dashed var(--rule);
+      padding-bottom: 3px;
+      display: inline-block;
+    }
+    .shelf-header .right .completed {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 13.5px;
+      color: var(--ink-2);
+      margin-top: 4px;
+    }
+    .crow {
+      display: grid;
+      grid-template-columns: 36px 1fr auto auto;
+      gap: 20px;
+      align-items: center;
+      padding: 18px 0 18px;
+      border-top: 1px solid var(--rule-soft);
+    }
+    .crow:first-of-type { border-top: none; }
+    .crow .cnum {
+      font-family: var(--sans);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--ink-4);
+    }
+    .crow .cname {
+      font-family: var(--serif);
+      font-size: 20px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .crow .cmeta {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-top: 4px;
+    }
+    .crow .cmeta .ok { color: var(--accent-2); }
+    .crow .pips {
+      display: flex; gap: 4px;
+    }
+    .crow .pip {
+      width: 16px; height: 4px;
+      background: var(--rule);
+    }
+    .crow .pip.on { background: var(--ink); }
+    .crow .stat {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-align: right;
+      color: var(--ink-3);
+      min-width: 100px;
+    }
+    .crow .stat.done { color: var(--accent-2); }
+    .crow .stat.prog { color: var(--accent-3); }
+    .addrow {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+      border-top: 1px dashed var(--rule);
+      color: var(--ink-3);
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+    .addrow .plus {
+      width: 22px; height: 22px;
+      border: 1px solid var(--rule);
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: var(--serif);
+      color: var(--ink-3);
+    }
+
+    /* ── D · Artifact ── */
+    .art-shell {
+      padding: 36px 60px 48px;
+    }
+    .art-shell .masthead {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+    }
+    .art-shell .masthead h3 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 30px;
+      letter-spacing: -0.02em;
+      margin: 0;
+      line-height: 1.05;
+      max-width: none;
+    }
+    .art-shell .masthead h3 em { font-style: italic; color: var(--accent); }
+    .art-shell .masthead .stamp {
+      font-family: var(--sans);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      text-align: right;
+      line-height: 1.7;
+    }
+    .art-section {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 26px;
+      padding: 14px 0 18px;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+    .art-section:last-of-type { border-bottom: none; }
+    .art-section .h {
+      font-family: var(--sans);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      padding-top: 4px;
+    }
+    .art-section .h .nm {
+      display: block;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 22px;
+      color: var(--accent);
+      letter-spacing: 0;
+      text-transform: none;
+      margin-bottom: 4px;
+    }
+    .art-section .b {
+      font-family: var(--serif);
+      font-size: 15.5px;
+      line-height: 1.5;
+      color: var(--ink);
+      max-width: none;
+    }
+    .art-section .ev {
+      margin-top: 8px;
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--ink-3);
+      letter-spacing: 0.02em;
+    }
+    .art-section .ev .lab {
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 9.5px;
+      margin-right: 8px;
+      color: var(--accent-2);
+    }
+    .art-section .lens-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .art-section .lchip {
+      font-family: var(--sans);
+      font-size: 10.5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--paper);
+      letter-spacing: 0.02em;
+    }
+    .art-bars {
+      margin-top: 22px;
+      padding: 18px 0 4px;
+      border-top: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+    }
+    .art-bars .bar {
+      font-family: var(--sans);
+    }
+    .art-bars .bar .lbl {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 6px;
+    }
+    .art-bars .bar .track {
+      height: 4px;
+      background: var(--rule);
+      position: relative;
+    }
+    .art-bars .bar .fill {
+      position: absolute; inset: 0 0 0 0;
+      background: var(--ink);
+    }
+    .art-bars .bar .fill.acc { background: var(--accent-2); }
+    .art-bars .bar .num {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 12px;
+      color: var(--ink-2);
+      margin-top: 4px;
+    }
+    @media (max-width: 720px) {
+      .art-shell { padding: 24px 22px 32px; }
+      .art-section { grid-template-columns: 1fr; gap: 6px; }
+      .art-bars { grid-template-columns: 1fr 1fr; }
+      .ws-shell { grid-template-columns: 1fr; gap: 18px; }
+      .ws-side { display: none; }
+      .ws-rail { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <article class="page">
+
+    <header class="mast">
+      <span class="pub"><em>Reflection</em> · a quiet column on teaching</span>
+      <span class="date">Issue 04 · May 2026</span>
+    </header>
+
+    <p class="eyebrow">Essay · on the end of the term</p>
+    <h1 class="title">Reflection<br/>is not <em>rumination</em>.</h1>
+    <p class="dek">
+      Every May, faculty walk out of the term carrying hundreds of small observations about how it went — and by mid-July, most of them are gone. The lossy step isn't memory. It's the absence of an instrument.
+    </p>
+    <p style="font-family:var(--sans);font-weight:600;font-size:15px;color:var(--accent);margin:0 0 34px;letter-spacing:0.01em;">
+      <strong>Scroll to the bottom to use the reflection app (it is in beta).</strong>
+    </p>
+    <p class="byline">
+      <span class="name">An essay</span>
+      <span class="dot">·</span>
+      <em>for instructors in CS, engineering, data science, informatics, and library science</em>
+      <span class="dot">·</span>
+      14 min read
+    </p>
+
+    <!-- ─────────── BODY ─────────── -->
+    <section class="first">
+
+      <p>
+        The first hallway conversation of summer goes the same way every year. You see a colleague at the mailboxes. They ask how your semester was. You say <em>"tough one"</em>, or <em>"the AI thing"</em>, or <em>"better than last year, I think."</em> They nod. You nod. Nothing useful is transmitted. Both of you forget the exchange by the time you reach the parking lot.
+      </p>
+
+      <p>
+        This is fine — it's a hallway conversation. The problem is that, for most faculty, it is also <em>the entirety of what gets recorded</em> about a term they just spent five months teaching. Anything more structured doesn't get done. Anything less structured doesn't survive contact with summer.
+      </p>
+
+      <p>
+        I have taught long enough now to know what the cost of that is, and it is not abstract. In late July, when fall syllabi are due and last fall is too far away to remember in any detail, I find myself making the same decisions I made last year — sometimes the same mistakes, occasionally the same good calls by accident — because <em>I no longer have the data</em>. The semester that was data-rich in May has become mood by August.
+      </p>
+
+      <p class="pull">
+        Without structured capture, you have no signal from this term. You only have mood.
+      </p>
+
+      <p>
+        That is the case I want to make in this post. Most of what we call <em>reflection</em>, in the academic sense — the end-of-term sit-and-think, the half-written notes-to-self file, the long email to a sympathetic colleague — is not reflection. It is <em>rumination</em>. It feels like reflection because it is recursive and uncomfortable and concerns teaching, but it does not produce signal you can act on. The difference is structural, and it is worth being precise about.
+      </p>
+
+    </section>
+
+    <!-- ─────────── SECTION 1 ─────────── -->
+    <h2><span class="nm">1 · The distinction</span>What rumination actually looks like.</h2>
+
+    <p>
+      Clinical psychology has a sharper definition of rumination than we usually give it credit for. It is repetitive thought about a negative event that does <em>not</em> progress toward resolution. The hallmark is not the discomfort — discomfort can be productive — but the <em>circling</em>. You return to the same observation, framed the same way, and you arrive at the same place. There is feeling without learning.
+    </p>
+
+    <p>
+      End-of-term teaching rumination has a recognizable shape. It sounds like this:
+    </p>
+
+    <blockquote>
+      <p>
+        The ML midterm project didn't really land this year. Students seemed checked out by the end. Honestly, the energy was off the whole semester. I don't know — kind of a hard one. Overall, I think the lectures were fine, but the lab sections were… something.
+      </p>
+      <cite>— A real paragraph from my own notes, May 2023</cite>
+    </blockquote>
+
+    <figure class="shot">
+      <div class="window">
+        <div class="chrome">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="url">instructional-reflection · DATA 220 · Spring 2026 · prompt 02 / 05</span>
+        </div>
+        <div class="ui-topbar">
+          <span class="mark"><span class="glyph">R</span> Instructional Reflection</span>
+          <span class="save"><span class="dotpip"></span> saved</span>
+        </div>
+        <div class="ws-shell">
+          <aside class="ws-side">
+            <div class="crumb">← Shelf</div>
+            <div class="doc-label">Document name</div>
+            <div class="doc-name">DATA 220 — Spring 2026 reflection</div>
+            <ol class="promptlist">
+              <li class="done"><span class="n">01</span><span>What worked</span></li>
+              <li class="cur"><span class="n">02</span><span>What broke</span></li>
+              <li><span class="n">03</span><span>What surprised you</span></li>
+              <li><span class="n">04</span><span>One question</span></li>
+              <li><span class="n">05</span><span>One decision</span></li>
+            </ol>
+            <div class="timer"><span class="lbl">Timer</span><span>11:42 / 20:00</span></div>
+          </aside>
+          <div class="ws-main">
+            <div class="step">Prompt 02 of 05 · ~4 min</div>
+            <h3 class="prompt">What broke, in <em>concrete terms</em>.</h3>
+            <p class="instr">Name where students struggled in ways you did not predict. Where the autograder rewarded the wrong thing. Where the assignment stopped measuring what you thought it measured.</p>
+            <div class="editor-mock">
+              The ML midterm project <span class="hedge">didn't really land</span> this year. Students <span class="hedge">seemed checked out</span> by the end. Honestly, the <span class="hedge">energy was off</span> the whole semester. I don't know — <span class="hedge">kind of</span> a hard one. <span class="hedge">Overall</span>, I think the lectures were fine, but the lab sections were… something.
+            </div>
+            <div class="editor-foot">
+              <span class="wc"><span class="num">46</span> words · floor 30 · ceiling 220</span>
+              <span>concreteness check · <strong style="color:var(--flag); font-weight:500;">5 flags</strong></span>
+            </div>
+            <div class="flags-mock">
+              <div class="flag-label">Concreteness check · 5 hedges</div>
+              <ul>
+                <li><span class="quoted">“didn't land”</span> — name what specifically fell short.</li>
+                <li><span class="quoted">“seemed checked out”</span> — describe what they did, not what they seemed.</li>
+                <li><span class="quoted">“energy was off”</span> — describe what students did.</li>
+                <li><span class="quoted">“kind of”</span> — pick a side. Did it or didn't it?</li>
+                <li><span class="quoted">“overall”</span> — name the assignment, not the average.</li>
+              </ul>
+            </div>
+          </div>
+          <aside class="ws-rail">
+            <div class="heading">Five qualities · this answer</div>
+            <ul class="qmini">
+              <li class="miss">Specific</li>
+              <li class="miss">Multi-lens</li>
+              <li class="miss">Evidence-grounded</li>
+              <li class="miss">Asks why</li>
+              <li class="miss">Closes the loop</li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+      <figcaption><span class="fignum">Figure 1</span> The same paragraph, fed to the instrument. Hedges highlighted in iron-oxide; the concreteness check names five tells in the side panel; the five-quality rail flags <em>zero of five</em>.</figcaption>
+    </figure>
+
+    <p>
+      Read it again. There is nothing in it. Not a single assignment is named. Not a single student question is preserved. <em>"Energy was off"</em> describes a room I cannot reconstruct. <em>"Something"</em> is the noise a paragraph makes when its writer has given up. This is not memory; this is the residue of memory after the specifics have evaporated.
+    </p>
+
+    <p>
+      I wrote that paragraph in May. By the time I opened it in July to plan fall, I could no longer tell you which week the midterm even fell in. The paragraph had become its own ground truth, and the ground truth said <em>tough semester</em>. So fall got a tough-semester response — a vague tightening of the policy, a slightly stricter rubric, a sentence in the syllabus about engagement. The actual problem, which I would later piece together from leftover gradebook exports, was that twelve teams had target leakage in their features and the cross-validation didn't catch it. I had taught the wrong lesson because I had written the wrong note.
+    </p>
+
+    <p class="pull">
+      The paragraph had become its own ground truth, and the ground truth said tough semester.
+    </p>
+
+    <p>
+      Real reflection does something different. It moves from <em>this term</em> to <em>this assignment, this moment, this question someone asked</em>, and from there to <em>what I will do in week one of next term because of it</em>. It is bounded, specific, and ends in a decision. If it does not end in a decision, the literature has a name for that too — it is journaling, which has its own virtues but is not what we mean here.
+    </p>
+
+    <div class="ornament">· · ·</div>
+
+    <!-- ─────────── SECTION 2 ─────────── -->
+    <h2><span class="nm">2 · The five qualities</span>Borrowing an instrument from the literature on reflective practice.</h2>
+
+    <p>
+      The teaching-and-learning literature has been arguing about what good reflection looks like for forty years, and the arguments are more compatible than the citation counts suggest. From Schön, from Brookfield, from Korthagen's ALACT cycle, from threshold-concepts work, you get a remarkably consistent picture. Strong instructional reflection has five qualities. Each is testable. Each can be present or absent from a sentence in your notes.
+    </p>
+
+    <ol class="numbered">
+      <li><span class="term">Specific.</span> <span class="gloss">It names an incident — an assignment, a lab, a code review, a search-strategy session, a moment in studio crit — not a semester. The unit of reflection is the incident.</span></li>
+      <li><span class="term">Multi-lens.</span> <span class="gloss">It draws on more than one view. Brookfield names four: your own, the students', a colleague's, and the literature. Most reflection runs on lens one alone. Even one beyond yours sharpens the read.</span></li>
+      <li><span class="term">Evidence-grounded.</span> <span class="gloss">It references actual artifacts — the autograder log, the commit history, the mid-semester survey, the studio-crit transcript, the assignment file itself. Memory is not evidence.</span></li>
+      <li><span class="term">Asks why.</span> <span class="gloss">It moves past description into design. Not "this happened," but "this happened because of which choice I made in the assignment, the rubric, or the scaffolding around it."</span></li>
+      <li><span class="term">Closes the loop.</span> <span class="gloss">It ends in a change you would actually make. Korthagen's framing: reflection without a planned alternative course of action is not reflection — it is one half of a cycle that never turned.</span></li>
+    </ol>
+
+    <p>
+      You can hold the paragraph from my 2023 notes up against this list and watch it fail every line. <em>Specific?</em> No — "the lab sections" is not a lab. <em>Multi-lens?</em> No — only my view, and a thin one. <em>Evidence-grounded?</em> No — no artifact referenced. <em>Asks why?</em> No — "didn't land" is a feeling, not a mechanism. <em>Closes the loop?</em> No — there is no fall-term decision implied. Zero for five.
+    </p>
+
+    <figure class="shot">
+      <div class="window">
+        <div class="chrome">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="url">scorecard · the rumination paragraph, against the five qualities</span>
+        </div>
+        <div class="scorecard">
+          <div class="head">
+            <div class="title">The 2023 paragraph — quality readout</div>
+            <div class="score"><span class="big">0</span>/ 5 met</div>
+          </div>
+          <div class="quote-row">
+            “The ML midterm project didn't really land this year. Students seemed checked out by the end. Honestly, the energy was off the whole semester…”
+          </div>
+          <div class="qrows">
+            <div class="q">
+              <span class="qmark">✕</span>
+              <div class="qname">Specific</div>
+              <div class="qsub">Names an incident, not a semester.</div>
+            </div>
+            <div class="q">
+              <span class="qmark">✕</span>
+              <div class="qname">Multi-lens</div>
+              <div class="qsub">Draws on more than your own view.</div>
+            </div>
+            <div class="q">
+              <span class="qmark">✕</span>
+              <div class="qname">Evidence-grounded</div>
+              <div class="qsub">References actual artifacts.</div>
+            </div>
+            <div class="q">
+              <span class="qmark">✕</span>
+              <div class="qname">Asks why</div>
+              <div class="qsub">Moves past description to design.</div>
+            </div>
+            <div class="q">
+              <span class="qmark">✕</span>
+              <div class="qname">Closes the loop</div>
+              <div class="qsub">Ends in a change you'd act on.</div>
+            </div>
+          </div>
+          <p class="verdict">Reflection that fails all five is journaling at best, rumination at worst.</p>
+        </div>
+      </div>
+      <figcaption><span class="fignum">Figure 2</span> The five-quality readout, applied to the rumination paragraph. Nothing on the rubric earns a mark. The cost of writing this paragraph in May is that you have only this paragraph in July.</figcaption>
+    </figure>
+
+    <p>
+      This is not a criticism of past me. Past me had just finished the term and was tired. The point is that you cannot reasonably ask someone to perform five-of-five reflection from scratch, with no scaffolding, at 9 p.m. on the last day of grading. You have to give them an instrument — something that prompts each of the five, in sequence, with enough specificity in the prompt itself that the obvious answers are already disqualified.
+    </p>
+
+    <div class="aside">
+      <div class="label">A small concession</div>
+      <p>The five qualities are not equally weighted. If you only have ten minutes and you have to drop one, drop multi-lens. Keep specific, evidence, and closes-the-loop. Brookfield will forgive you. Korthagen will not.</p>
+    </div>
+
+    <div class="ornament">· · ·</div>
+
+    <!-- ─────────── SECTION 3 ─────────── -->
+    <h2><span class="nm">3 · The protocol</span>Twenty minutes per course. One document. Five prompts.</h2>
+
+    <p>
+      The instrument I now use, and the one this column will spend the rest of the year arguing for, is short on purpose. Twenty minutes per course. One document per course — not one per semester, because the unit of pedagogical thinking is the course, not the term. Five prompts. Done before grades close, while the term still has texture.
+    </p>
+
+    <p>
+      The prompts are not subtle. They are designed to be hard to ruminate inside.
+    </p>
+
+    <ol class="numbered">
+      <li><span class="term">What worked, in concrete terms.</span> <span class="gloss">Name a specific assignment, a lab, a code review, a search exercise — a structural choice that produced student work you were glad to read. Not a semester. An incident.</span></li>
+      <li><span class="term">What broke, in concrete terms.</span> <span class="gloss">Where did students struggle in ways you didn't predict? Where did the autograder reward the wrong thing? Where did the lit-search assignment collapse into the first three Google results?</span></li>
+      <li><span class="term">What surprised you.</span> <span class="gloss">The data point you didn't have a slot in your model for. The question that's still sitting with you. The student who got sharp in week 12 and you don't yet know why.</span></li>
+      <li><span class="term">One question this term left you with.</span> <span class="gloss">One. Not ten. The question you would still be carrying at the end of August whether you wrote it down or not.</span></li>
+      <li><span class="term">One decision for next year.</span> <span class="gloss">Specific enough that future-you reads it in July and knows exactly what to change. If you cannot explain it to a colleague before September, it is not a decision yet.</span></li>
+    </ol>
+
+    <p>
+      I keep one document per course, named for the course and the term, in a folder I open every July. <em>CS 187 — Spring 2026 reflection.</em> <em>DATA 220 — Spring 2026 reflection.</em> Three to five of these, twice a year, ten or twelve a year. After six years, the folder is the most useful single artifact about my own teaching that I own.
+    </p>
+
+    <figure class="shot">
+      <div class="window">
+        <div class="chrome">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="url">instructional-reflection · the shelf · spring 2026</span>
+        </div>
+        <div class="ui-topbar">
+          <span class="mark"><span class="glyph">R</span> Instructional Reflection</span>
+          <span class="save"><span class="dotpip"></span> saved</span>
+        </div>
+        <div class="shelf-shell">
+          <div class="shelf-header">
+            <div>
+              <div class="eb">The shelf</div>
+              <h3>Your courses, this term.</h3>
+            </div>
+            <div class="right">
+              <div class="term">Spring 2026</div>
+              <div class="completed"><em>2 of 4 reflected</em></div>
+            </div>
+          </div>
+          <div class="crow">
+            <span class="cnum">01</span>
+            <div>
+              <div class="cname">CS 187 — Data Structures &amp; Algorithms</div>
+              <div class="cmeta">Section 01 · 96 students · <span class="ok">§00 reviewed</span> · 2 tried · 1 archived</div>
+            </div>
+            <div class="pips">
+              <span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span>
+            </div>
+            <div class="stat done">Loop closed</div>
+          </div>
+          <div class="crow">
+            <span class="cnum">02</span>
+            <div>
+              <div class="cname">DATA 220 — Applied Machine Learning</div>
+              <div class="cmeta">Section A · 42 students · <span class="ok">§00 reviewed</span></div>
+            </div>
+            <div class="pips">
+              <span class="pip on"></span><span class="pip on"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span>
+            </div>
+            <div class="stat prog">2/5 prompts</div>
+          </div>
+          <div class="crow">
+            <span class="cnum">03</span>
+            <div>
+              <div class="cname">INFO 340 — Human-Centered Information Systems</div>
+              <div class="cmeta">Section — · 28 students · <span class="ok">§00 reviewed</span> · 1 tried</div>
+            </div>
+            <div class="pips">
+              <span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span>
+            </div>
+            <div class="stat done">Loop closed</div>
+          </div>
+          <div class="crow">
+            <span class="cnum">04</span>
+            <div>
+              <div class="cname">LIS 510 — Information Retrieval &amp; Search</div>
+              <div class="cmeta">Section 01 · 22 students</div>
+            </div>
+            <div class="pips">
+              <span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span>
+            </div>
+            <div class="stat">Not started</div>
+          </div>
+          <div class="addrow">
+            <span class="plus">+</span><span>Add a course</span>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="fignum">Figure 3</span> The shelf. One row per course, twenty minutes each, the term's progress at a glance. Section 00 — the LMS data review — is the gate before any writing starts.</figcaption>
+    </figure>
+
+    <p>
+      You may notice that none of those prompts ask <em>"how did the semester go."</em> That is intentional. <em>How did the semester go</em> is the question rumination is built to answer. The five prompts above are built to be unanswerable in mood-language.
+    </p>
+
+    <p class="pull">
+      The five prompts are built to be unanswerable in mood-language.
+    </p>
+
+    <div class="ornament">· · ·</div>
+
+    <!-- ─────────── SECTION 4 ─────────── -->
+    <h2><span class="nm">4 · Why it compounds</span>The dossier-week argument, for those who need one.</h2>
+
+    <p>
+      If you teach in a tenure-track or promotion-track role, you already know about dossier week — the panicked week, eighteen months before a review, when you try to reconstruct six years of teaching from a calendar and a vibe. Almost no one writes their teaching dossier from contemporaneous notes, because almost no one has contemporaneous notes.
+    </p>
+
+    <p>
+      Five small artifacts a year, sustained for six years, becomes thirty artifacts. Each one is timestamped, course-specific, evidence-anchored, and ends in a decision <em>you can show was acted on the following term</em>. That is a fundamentally stronger dossier than any dossier-week effort, and it is generated as a by-product of teaching well, not as a separate performance.
+    </p>
+
+    <p>
+      The five small artifacts I have settled on, in addition to per-course reflections, are mundane:
+    </p>
+
+    <p>
+      An annual <strong>response-to-feedback memo</strong> — what was raised in evaluations, what I'm taking up, what I'm not, and the reasoning. (The reasoning is the part that earns the credibility; do not skip it.) An annual <strong>philosophy addendum</strong> — where my thinking shifted this year, where it was reinforced, what I would defend more strongly now. A per-cycle <strong>retrospective</strong> — every five terms, an hour to read all the prior decisions together as a body, and to name what is improving without my having noticed. And, ongoingly, a small log of <strong>what I tried</strong> and a folder of <strong>artifacts I'd want to show someone</strong> — the rubric I rewrote, the assignment brief I'm proud of, the lab manual that finally taught the thing.
+    </p>
+
+    <p>
+      None of these are heavy. The heaviness of dossier week is what we pay for not generating them in the moment.
+    </p>
+
+    <figure class="shot">
+      <div class="window">
+        <div class="chrome">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="url">instructional-reflection · artifact · DATA 220 — Spring 2026</span>
+        </div>
+        <div class="ui-topbar">
+          <span class="mark"><span class="glyph">R</span> Instructional Reflection</span>
+          <span class="save"><span class="dotpip"></span> saved</span>
+        </div>
+        <div class="art-shell">
+          <div class="masthead">
+            <h3>DATA 220 — Applied Machine Learning<br/><em>End-of-term reflection</em></h3>
+            <div class="stamp">Spring 2026<br/>Section A · 42 students<br/>completed May 12 · 21 min</div>
+          </div>
+
+          <div class="art-section">
+            <div class="h"><span class="nm">02</span>What broke</div>
+            <div class="b">
+              The final-project track. Twelve of forty-two teams ended up with target leakage in their features and the cross-validation didn't catch it; one team's 0.97 F1 was almost entirely explained by a column that encoded the label. The constraint was too loose: no checkpoint where someone outside the team had to read the feature list.
+              <div class="lens-row">
+                <span class="lchip">Your own</span>
+                <span class="lchip">Students'</span>
+                <span class="lchip">A colleague's</span>
+              </div>
+              <div class="ev"><span class="lab">Evidence</span>DATA 220 final-project leaderboard CSV; M.'s TA debrief, week 11.</div>
+            </div>
+          </div>
+
+          <div class="art-section">
+            <div class="h"><span class="nm">04</span>One question</div>
+            <div class="b">
+              If the LLM writes the boilerplate and the autograder grades the output, what is the final project in DATA 220 actually measuring when half the teams hand me back leaderboard scores they cannot defend under questioning?
+            </div>
+          </div>
+
+          <div class="art-section">
+            <div class="h"><span class="nm">05</span>One decision</div>
+            <div class="b">
+              Add a week-7 <em>feature-list crit</em>: each team presents the feature schema to a non-team reviewer who has to find one column that could leak the label. No team advances to model training until a reviewer has signed the schema. Rubric grows a row for &ldquo;can defend the absence of leakage&rdquo; — graded, not just hoped for.
+            </div>
+          </div>
+
+          <div class="art-bars">
+            <div class="bar"><div class="lbl">Specific</div><div class="track"><div class="fill acc" style="right:8%;"></div></div><div class="num">strong</div></div>
+            <div class="bar"><div class="lbl">Multi-lens</div><div class="track"><div class="fill acc" style="right:30%;"></div></div><div class="num">3 of 4</div></div>
+            <div class="bar"><div class="lbl">Evidence</div><div class="track"><div class="fill acc" style="right:12%;"></div></div><div class="num">named</div></div>
+            <div class="bar"><div class="lbl">Asks why</div><div class="track"><div class="fill acc" style="right:18%;"></div></div><div class="num">yes</div></div>
+            <div class="bar"><div class="lbl">Closes loop</div><div class="track"><div class="fill acc" style="right:8%;"></div></div><div class="num">decision</div></div>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="fignum">Figure 4</span> The July artifact — the same instructor's reflection on DATA 220, rewritten through the protocol. Specific incidents, more than one lens, evidence pointers, and a decision concrete enough to act on in week one of fall.</figcaption>
+    </figure>
+
+    <div class="ornament">· · ·</div>
+
+    <!-- ─────────── SECTION 5 ─────────── -->
+    <h2><span class="nm">5 · The scholarship layer</span>For one or two courses a year — not all of them.</h2>
+
+    <p>
+      A separate note for the SoTL-curious. Reflection ends in a <em>decision</em>. Scholarship of teaching and learning ends in a <em>claim</em> — a sentence about student learning that you could defend to a colleague who reads your evidence with a skeptical eye.
+    </p>
+
+    <p>
+      For most terms, for most courses, that distinction does not need to come up. The end-of-term reflection is the artifact, and it is sufficient. For the one or two courses a year where you are running an intervention you would want to defend — a new feedback protocol, a redesigned search-strategy unit, a different way of teaching the autograder-prone assignment — the same protocol can be wrapped in a methodological scaffold: a guiding question written before week one, an IRB posture, a study design named, and crucially, <em>a falsifier named in advance</em>. What evidence, by week eight, would force you to retract the hypothesis?
+    </p>
+
+    <p>
+      A reflection that survives its own falsifier is no longer rumination. It is a claim. And the difference, for promotion files and for the field, is enormous.
+    </p>
+
+    <div class="aside">
+      <div class="label">When not to bother</div>
+      <p>If you cannot name the falsifier before week one, the SoTL scaffold will produce a worse artifact than the regular reflection. Leave it off. Most courses, most terms, this stays off.</p>
+    </div>
+
+    <div class="ornament">· · ·</div>
+
+    <!-- ─────────── SECTION 6 ─────────── -->
+    <h2><span class="nm">6 · The hallway, revised</span>What I want this column to do.</h2>
+
+    <p>
+      Back to the hallway. The colleague asks how your semester was. The honest answer, after twenty minutes per course and a written page you have actually read back, is no longer <em>tough one</em>. It is something like:
+    </p>
+
+    <blockquote>
+      <p>
+        The "reverse the requirements" exercise in ENGR 110 worked better than I expected — students started asking whether the design brief itself should be the artifact we grade. But the DATA 220 final project broke quietly: twelve teams had target leakage and I missed it because there was no checkpoint where someone outside the team had to read the feature list. I'm adding that checkpoint in the fall.
+      </p>
+    </blockquote>
+
+    <p>
+      That is a paragraph someone else can <em>do something with</em> — recommend a reading, share an analogous failure mode, copy the checkpoint into their own assignment. It is also, not incidentally, a paragraph future-you can use. It is the same length as the rumination paragraph I quoted at the start of this essay. It cost twenty minutes more to produce. It is worth, conservatively, a hundred times more.
+    </p>
+
+    <p class="pull">
+      Twenty minutes more. A hundred times more useful in July.
+    </p>
+
+    <p>
+      Faculty-teaching tools have a long history of failing for the same reason: they are designed to feel like productivity tools, and faculty correctly recognize that as a category error. Teaching is not a productivity problem. It is a thinking problem. What we need at the end of the term is not a dashboard; it is an instrument — quiet, sharp, twenty minutes long — that helps us produce a single page per course we will actually re-read.
+    </p>
+
+    <p>
+      Reflection is not rumination. It is not journaling. It is the missing measurement at the end of a term, and we have been getting by without it for too long.
+    </p>
+
+    <!-- ─────────── CTA ─────────── -->
+    <div class="cta">
+      <span class="corner">The tool</span>
+      <h3>If you'd like to try the protocol — <em>Instructional Reflection</em>.</h3>
+      <p>
+        A small browser-based instrument that walks you through the five prompts, one course at a time. Saves locally; no account, no server, no analytics. Free. Designed for instructors in engineering, CS, data science, informatics, and library science.
+      </p>
+      <a class="btn" href="https://instructional-reflection.vercel.app/">Open the tool <span class="arrow">→</span></a>
+      <span class="also">or read the <a href="Facilitator Guide.html">facilitator guide</a> if you run faculty development sessions.</span>
+    </div>
+
+    <!-- ─────────── ABOUT ─────────── -->
+    <div class="about">
+      <div class="mono">R</div>
+      <p>
+        <span class="name">About this column.</span>
+        <em>Reflection</em> is a quiet monthly column on what teaching looks like when you treat it as a craft with instruments. Aimed at faculty in engineering, computer science, data science, informatics, and library science. No comments section, on purpose. If a post is useful, forward it to one colleague.
+      </p>
+    </div>
+
+    <p class="endnote">
+      With debts to Donald Schön (<em>The Reflective Practitioner</em>), Stephen Brookfield (<em>Becoming a Critically Reflective Teacher</em>), and Fred Korthagen on the ALACT cycle — and to every TA who has ever told me, gently, that the assignment was measuring the wrong thing.
+    </p>
+
+  </article>
+</body>
+</html>

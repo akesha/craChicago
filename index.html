@@ -549,6 +549,11 @@
   <!-- ================= RESOURCES ================= -->
   <sc-if value="{{ isTab6 }}" hint-placeholder-val="{{ false }}">
   <section class="mtc-panel" data-screen-label="Resources" style="">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #E4DECF;">
+      <span style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:#8A8472;margin-right:6px;">Resources</span>
+      <button onClick="{{ goTo6 }}" style="{{ subInstStyle }}">Institutions &amp; guides</button>
+      <button onClick="{{ goTo9 }}" style="{{ subReflStyle }}">Reflection essay</button>
+    </div>
     <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:#7A0019;text-transform:uppercase;margin-bottom:10px;">Teaching &amp; career resources</div>
     <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0 0 12px;letter-spacing:-.01em;">For early-career computer science faculty</h2>
     <p style="font-size:16px;color:#41505E;max-width:74ch;line-height:1.6;margin:0 0 10px;">A companion to the workshop. Each institution leads with its <strong>teaching-portfolio help</strong> — programs, guides, and consultations — then its broader teaching center and new-faculty support. <strong>Start with your own center</strong>, then use the national CS-specific resources at the end.</p>
@@ -609,6 +614,21 @@
     </div>
 
     <p style="font-size:13.5px;color:#8A8472;font-style:italic;max-width:74ch;line-height:1.55;margin:22px 0 0;border-top:1px solid #E4DECF;padding-top:18px;">Most of these centers are POD Network members and CIRTL-affiliated, so programs and language transfer well if you move between campuses.</p>
+  </section>
+  </sc-if>
+
+  <!-- ================= REFLECTION ESSAY (embedded) ================= -->
+  <sc-if value="{{ isTab9 }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Reflection essay" style="">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:20px;">
+      <span style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:#8A8472;margin-right:6px;">Resources</span>
+      <button onClick="{{ goTo6 }}" style="{{ subInstStyle }}">Institutions &amp; guides</button>
+      <button onClick="{{ goTo9 }}" style="{{ subReflStyle }}">Reflection essay</button>
+      <a href="Reflection Is Not Rumination.html" target="_blank" rel="noopener" style="margin-left:auto;font-size:13px;color:#7A0019;text-decoration:none;font-weight:600;border-bottom:1px solid rgba(122,0,25,.3);">Open full page ↗</a>
+    </div>
+    <div style="border:1px solid #E4DECF;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(44,37,33,.06);background:#f5efe4;">
+      <iframe src="Reflection Is Not Rumination.html" title="Reflection Is Not Rumination" style="display:block;width:100%;height:calc(100vh - 220px);min-height:600px;border:none;"></iframe>
+    </div>
   </section>
   </sc-if>
 
@@ -1391,6 +1411,10 @@ class Component extends DCLogic {
     return `display:inline-flex;align-items:center;white-space:nowrap;border:none;cursor:pointer;font-size:14px;font-weight:600;padding:9px 15px;border-radius:9px;transition:all .15s;`
       + (active ? `background:#2C2521;color:#fff;` : `background:transparent;color:#6B7785;`);
   }
+  subNavStyle(active) {
+    return `display:inline-flex;align-items:center;gap:7px;border:1px solid ${active?'#2C2521':'#E4DECF'};cursor:pointer;font-size:14px;font-weight:600;padding:8px 15px;border-radius:9px;transition:all .15s;`
+      + (active ? `background:#2C2521;color:#fff;` : `background:transparent;color:#6B7785;`);
+  }
   weakStyle(v) {
     const active = this.state.data.a1weak === v;
     return `flex:1;border:1px solid ${active?'#990000':'#E0D6C2'};background:${active?'#990000':'#fff'};color:${active?'#fff':'#5B6B7A'};font-weight:600;font-size:13.5px;padding:10px 6px;border-radius:9px;cursor:pointer;transition:all .15s;`;
@@ -1495,6 +1519,16 @@ class Component extends DCLogic {
         keyPages:[
           { label:'Learning Portfolio Program', url:'https://www.luc.edu/celts/programs/learningportfolio/' },
           { label:'Faculty/staff portfolio track', url:'https://www.luc.edu/experiential/learningportfolio/facultstaff.shtml' },
+        ] },
+      { name:'Chicago State University', center:'Center for Teaching and Research Excellence (CTRE)', url:'https://www.csu.edu/ctre/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' CSU faculty assemble a Faculty Excellence Portfolio for retention, tenure, and promotion, and CTRE is the campus hub that supports it — one-on-one or by department (ctre@csu.edu). Its Faculty Handbook and CTRE resources spell out what the portfolio needs.' },
+          { lead:'', text:'Use the Provost / Academic Personnel (APCA) timetable and Departmental Application of Criteria (DAC) so your portfolio maps to the exact standards your unit uses.' },
+          { lead:'', text:'As a teaching-focused Minority-Serving Institution, CSU values documented, equity-minded teaching and mentoring — name those contributions explicitly.' },
+        ],
+        keyPages:[
+          { label:'CTRE home', url:'https://www.csu.edu/ctre/' },
+          { label:'Faculty Handbook (P&T)', url:'https://www.csu.edu/provost/APCA/documents/Faculty_Handbook.pdf' },
         ] },
       { name:'Boston University', center:'Institute for Excellence in Teaching & Learning (formerly the CTL)', url:'https://www.bu.edu/excellence/',
         bullets:[
@@ -1622,10 +1656,16 @@ class Component extends DCLogic {
       // tabs
       isTab0:s.activeTab===0, isTab1:s.activeTab===1, isTab2:s.activeTab===2, isTab3:s.activeTab===3,
       isTab4:s.activeTab===4, isTab5:s.activeTab===5, isTab6:s.activeTab===6, isTab7:s.activeTab===7, isTab8:s.activeTab===8,
+      isTab9:s.activeTab===9, isTab10:s.activeTab===10,
       goTo0:this.go(0), goTo1:this.go(1), goTo2:this.go(2), goTo3:this.go(3),
       goTo4:this.go(4), goTo5:this.go(5), goTo6:this.go(6), goTo7:this.go(7), goTo8:this.go(8),
+      goTo9:this.go(9), goTo10:this.go(10),
       tab0Style:this.tabStyle(0), tab1Style:this.tabStyle(1), tab2Style:this.tabStyle(2), tab3Style:this.tabStyle(3),
       tab4Style:this.tabStyle(4), tab5Style:this.tabStyle(5), tab6Style:this.tabStyle(6), tab7Style:this.tabStyle(7), tab8Style:this.tabStyle(8),
+      // Resources submenu (shown on tabs 6/9/10)
+      subInstStyle: this.subNavStyle(s.activeTab===6),
+      subReflStyle: this.subNavStyle(s.activeTab===9),
+      subGuideStyle: this.subNavStyle(s.activeTab===10),
 
       d,
       onName:this.field('name'), onCourse:this.field('course'),
