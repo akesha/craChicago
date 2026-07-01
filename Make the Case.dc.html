@@ -102,7 +102,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <button onClick="{{ openPresent }}" style="display:inline-flex;align-items:center;gap:7px;border:1px solid #E8D2CD;background:#F3E7E2;color:#7A0019;font-weight:600;font-size:13px;padding:9px 14px;border-radius:10px;cursor:pointer;" style-hover="background:#EDD9D4;">
-          <span style="width:8px;height:8px;border-radius:2px;background:#990000;display:inline-block;"></span>Present mode
+          <span style="width:8px;height:8px;border-radius:2px;background:#990000;display:inline-block;"></span>Slides
         </button>
         <button onClick="{{ restart }}" title="Clear all your entries" style="border:1px solid #E4DECF;background:transparent;color:#8A8472;font-size:12px;padding:9px 11px;border-radius:10px;cursor:pointer;" style-hover="color:#990000;border-color:#E8CFCB;">Reset</button>
       </div>
@@ -796,36 +796,122 @@
     <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:#A89F8C;">MAKE THE CASE · BUILDING A TEACHING PORTFOLIO FOR PROMOTION · {{ inst }}</div>
   </footer>
 
-  <!-- ===== PRESENT MODE OVERLAY ===== -->
+  <!-- ===== DECK / PRESENT OVERLAY ===== -->
   <sc-if value="{{ present }}" hint-placeholder-val="{{ false }}">
-  <div data-noprint="1" style="position:fixed;inset:0;z-index:90;background:{{ pres.bg }};color:#fff;display:flex;flex-direction:column;animation:mtcFadeUp .35s ease both;">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:26px 40px;">
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.75);">{{ pres.kicker }}</div>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <button onClick="{{ presPrev }}" style="border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:14px;padding:8px 14px;border-radius:9px;cursor:pointer;">‹ Prev</button>
-        <button onClick="{{ presNext }}" style="border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:14px;padding:8px 14px;border-radius:9px;cursor:pointer;">Next ›</button>
-        <button onClick="{{ closePresent }}" style="border:none;background:rgba(255,255,255,.15);color:#fff;font-size:14px;font-weight:600;padding:8px 16px;border-radius:9px;cursor:pointer;">Exit ✕</button>
+  <div data-noprint="1" style="position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;animation:mtcFadeUp .3s ease both;background:{{ deck.bg }};color:{{ deck.fg }};">
+
+    <!-- top bar -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:22px 40px;gap:20px;flex:none;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:{{ deck.kickerColor }};min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ deck.kicker }}</div>
+      <div style="display:flex;gap:10px;align-items:center;flex:none;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:{{ deck.counterColor }};margin-right:6px;">{{ deck.num }} / {{ deck.totalStr }}</span>
+        <button onClick="{{ deckPrev }}" style="border:1px solid {{ deck.navBorder }};background:transparent;color:{{ deck.navColor }};font-size:14px;padding:8px 14px;border-radius:9px;cursor:pointer;">‹ Prev</button>
+        <button onClick="{{ deckNext }}" style="border:1px solid {{ deck.navBorder }};background:transparent;color:{{ deck.navColor }};font-size:14px;padding:8px 14px;border-radius:9px;cursor:pointer;">Next ›</button>
+        <button onClick="{{ closePresent }}" style="border:none;background:{{ deck.kickerColor }};color:{{ deck.bg }};font-size:14px;font-weight:700;padding:8px 16px;border-radius:9px;cursor:pointer;">Exit ✕</button>
       </div>
     </div>
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 7vw 4vh;max-width:1400px;margin:0 auto;width:100%;">
-      <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:5.4vw;line-height:1.04;margin:0 0 3vh;letter-spacing:-.01em;">{{ pres.title }}</h1>
-      <p style="font-size:2vw;line-height:1.5;color:rgba(255,255,255,.88);max-width:30ch;margin:0 0 5vh;">{{ pres.setup }}</p>
-      <div style="display:flex;flex-direction:column;gap:2.2vh;">
-        <sc-for list="{{ pres.steps }}" as="s" hint-placeholder-count="3">
-          <div style="display:flex;gap:20px;align-items:baseline;">
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:1.4vw;color:rgba(255,255,255,.6);flex:none;min-width:5vw;">{{ s.time }}</span>
-            <span style="font-size:1.8vw;color:#fff;">{{ s.text }}</span>
+
+    <!-- content -->
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:1vh 6vw;max-width:1520px;margin:0 auto;width:100%;min-height:0;overflow:auto;">
+
+      <!-- HERO: title / bigidea / close -->
+      <sc-if value="{{ deck.isTitle }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;">
+          <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:clamp(44px,7vw,104px);line-height:.98;margin:0 0 2.5vh;letter-spacing:-.02em;">{{ deck.title }}</h1>
+          <div style="font-family:'Spectral',serif;font-size:clamp(20px,2.6vw,40px);color:{{ deck.kickerColor }};margin-bottom:3.5vh;">{{ deck.title2 }}</div>
+          <p style="font-size:clamp(16px,1.7vw,26px);line-height:1.5;max-width:44ch;margin:0 auto;opacity:.9;">{{ deck.lead }}</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{ deck.isBigidea }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:clamp(34px,5.4vw,80px);line-height:1.04;margin:0 0 4vh;letter-spacing:-.015em;max-width:20ch;">{{ deck.title }}</h1>
+          <p style="font-size:clamp(17px,1.9vw,30px);line-height:1.5;max-width:40ch;margin:0;opacity:.92;">{{ deck.lead }}</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{ deck.isClose }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:clamp(38px,6vw,88px);line-height:1.02;margin:0 0 4vh;letter-spacing:-.015em;max-width:18ch;">{{ deck.title }}</h1>
+          <p style="font-size:clamp(17px,1.9vw,30px);line-height:1.5;max-width:42ch;margin:0;opacity:.92;">{{ deck.lead }}</p>
+        </div>
+      </sc-if>
+
+      <!-- AGENDA -->
+      <sc-if value="{{ deck.isAgenda }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:clamp(30px,3.8vw,54px);line-height:1.05;margin:0 0 3vh;letter-spacing:-.01em;">{{ deck.title }}</h1>
+          <div style="display:flex;flex-direction:column;gap:1.1vh;">
+            <sc-for list="{{ deck.blocks }}" as="b" hint-placeholder-count="8">
+              <div style="display:flex;gap:24px;align-items:baseline;border-bottom:1px solid {{ deck.footBorder }};padding-bottom:1.1vh;">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:clamp(13px,1.15vw,18px);color:{{ deck.kickerColor }};flex:none;min-width:74px;">{{ b.label }}</span>
+                <span style="font-size:clamp(15px,1.4vw,23px);">{{ b.text }}</span>
+              </div>
+            </sc-for>
           </div>
-        </sc-for>
-      </div>
+        </div>
+      </sc-if>
+
+      <!-- TABLE -->
+      <sc-if value="{{ deck.isTable }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:clamp(30px,3.8vw,54px);line-height:1.05;margin:0 0 2.5vh;letter-spacing:-.01em;">{{ deck.title }}</h1>
+          <div style="display:flex;flex-direction:column;gap:0;border-top:1px solid {{ deck.footBorder }};">
+            <sc-for list="{{ deck.blocks }}" as="b" hint-placeholder-count="7">
+              <div style="display:grid;grid-template-columns:minmax(150px,1fr) 2.4fr;gap:20px;border-bottom:1px solid {{ deck.footBorder }};padding:1.05vh 0;">
+                <span style="font-family:'Spectral',serif;font-weight:600;font-size:clamp(14px,1.25vw,20px);color:{{ deck.kickerColor }};">{{ b.label }}</span>
+                <span style="font-size:clamp(13px,1.15vw,18px);line-height:1.4;">{{ b.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- CARDS: generic + activity -->
+      <sc-if value="{{ deck.isCards }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:clamp(30px,3.8vw,54px);line-height:1.05;margin:0 0 1.6vh;letter-spacing:-.01em;">{{ deck.title }}</h1>
+          <sc-if value="{{ deck.hasLead }}" hint-placeholder-val="{{ false }}">
+            <p style="font-size:clamp(15px,1.5vw,24px);line-height:1.5;max-width:56ch;margin:0 0 3vh;opacity:.9;">{{ deck.lead }}</p>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:repeat({{ deck.cols }},minmax(0,1fr));gap:clamp(12px,1.4vw,22px);">
+            <sc-for list="{{ deck.blocks }}" as="b" hint-placeholder-count="3">
+              <div style="background:{{ deck.cardBg }};border:1px solid {{ deck.cardBorder }};border-radius:14px;border-top:3px solid {{ deck.kickerColor }};padding:clamp(14px,1.5vw,24px);">
+                <div style="font-family:'Spectral',serif;font-weight:600;font-size:clamp(16px,1.35vw,24px);color:{{ deck.cardLabel }};margin-bottom:.8vh;">{{ b.label }}</div>
+                <div style="font-size:clamp(13px,1.1vw,18px);line-height:1.45;opacity:.92;">{{ b.text }}</div>
+                <sc-if value="{{ b.hasItems }}" hint-placeholder-val="{{ false }}">
+                  <ul style="margin:1vh 0 0;padding-left:18px;display:flex;flex-direction:column;gap:.5vh;">
+                    <sc-for list="{{ b.items }}" as="it" hint-placeholder-count="3">
+                      <li style="font-size:clamp(12px,1vw,16px);line-height:1.4;opacity:.85;">{{ it.text }}</li>
+                    </sc-for>
+                  </ul>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:24px 40px;border-top:1px solid rgba(255,255,255,.15);">
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:7vw;font-weight:500;line-height:1;color:#fff;">{{ pres.timer }}</div>
-      <div style="display:flex;gap:12px;">
-        <button onClick="{{ pres.toggle }}" style="border:none;background:#fff;color:{{ pres.bg }};font-weight:700;font-size:18px;padding:14px 30px;border-radius:12px;cursor:pointer;">{{ pres.timerLabel }}</button>
-        <button onClick="{{ pres.reset }}" style="border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;font-size:16px;padding:14px 22px;border-radius:12px;cursor:pointer;">Reset</button>
+
+    <!-- foot band -->
+    <sc-if value="{{ deck.hasFoot }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:none;padding:1.4vh 6vw;border-top:1px solid {{ deck.footBorder }};">
+        <p style="margin:0;font-size:clamp(12px,1.05vw,17px);line-height:1.45;color:{{ deck.footColor }};max-width:90ch;">{{ deck.foot }}</p>
       </div>
-    </div>
+    </sc-if>
+
+    <!-- timer band (activity slides) -->
+    <sc-if value="{{ deck.timer.show }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:none;display:flex;justify-content:space-between;align-items:center;padding:2vh 6vw;background:rgba(153,0,0,.1);border-top:1px solid {{ deck.footBorder }};">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(40px,7vw,104px);font-weight:500;line-height:1;color:{{ deck.timer.color }};">{{ deck.timer.display }}</div>
+        <div style="display:flex;gap:12px;">
+          <button onClick="{{ deck.timer.toggle }}" style="border:none;background:#990000;color:#fff;font-weight:700;font-size:clamp(15px,1.3vw,20px);padding:14px 30px;border-radius:12px;cursor:pointer;">{{ deck.timer.label }}</button>
+          <button onClick="{{ deck.timer.reset }}" style="border:1px solid {{ deck.navBorder }};background:transparent;color:{{ deck.navColor }};font-size:clamp(14px,1.1vw,18px);padding:14px 22px;border-radius:12px;cursor:pointer;">Reset</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- progress -->
+    <div style="flex:none;height:6px;background:{{ deck.barTrack }};"><div style="height:100%;background:{{ deck.barFill }};transition:width .3s ease;width:{{ deck.progressPct }}%;"></div></div>
   </div>
   </sc-if>
 
@@ -850,7 +936,7 @@ class Component extends DCLogic {
     this.state = {
       activeTab: 0,
       present: false,
-      presentAct: 1,
+      slideIdx: 0,
       copied: false,
       data: { ...defaults.data, ...(saved.data||{}) },
       rows: (saved.rows && saved.rows.length) ? saved.rows : defaults.rows,
@@ -941,13 +1027,21 @@ class Component extends DCLogic {
   componentDidMount() {
     this._iv = setInterval(() => this.tick(), 1000);
     window.addEventListener('mtc-live', this.onLiveEvent);
+    window.addEventListener('keydown', this.onKey);
     this.setState({ liveStatus: this.liveStatusNow() });
   }
   componentWillUnmount() {
     clearInterval(this._iv);
     window.removeEventListener('mtc-live', this.onLiveEvent);
+    window.removeEventListener('keydown', this.onKey);
     this.unsubscribe();
   }
+  onKey = (e) => {
+    if (!this.state.present) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); this.deckStep(1)(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); this.deckStep(-1)(); }
+    else if (e.key === 'Escape') { this.closePresent(); }
+  };
   tick() {
     this.setState(s => {
       let changed = false; const t = { ...s.timers };
@@ -994,27 +1088,200 @@ class Component extends DCLogic {
     };
   }
 
-  openPresent = () => { const map = {1:1,2:2,3:3}; const act = map[this.state.activeTab] || 1; this.setState({ present:true, presentAct:act }); };
+  openPresent = () => {
+    const map = { 1:10, 2:12, 3:15 }; // jump near the matching activity slide
+    const idx = map[this.state.activeTab] != null ? map[this.state.activeTab] : 0;
+    this.setState({ present:true, slideIdx: idx });
+  };
   closePresent = () => this.setState({ present:false });
-  presStep(d){ return () => this.setState(s => ({ presentAct: Math.min(3, Math.max(1, s.presentAct + d)) })); }
+  deckStep(d){ return () => this.setState(s => ({ slideIdx: Math.min(this.deckSlides().length-1, Math.max(0, s.slideIdx + d)) })); }
+  goSlide(i){ return () => this.setState({ present:true, slideIdx:i }); }
 
-  presentData() {
-    const a = this.state.presentAct;
-    const defs = {
-      1: { kicker:'Activity 1 · Hands-on · 9 min', title:'Draft your narrative core', bg:'#2C2521', key:'a1',
-           setup:'Fill the stem for one course. Write silently. Do not polish — we want a true rough draft.',
-           steps:[ {time:'7 min',text:'Silent rough draft for one course.'}, {time:'2 min',text:'A few volunteers read aloud.'}, {time:'—',text:'Together, locate the claim, evidence, and reasoning.'} ] },
-      2: { kicker:'Activity 2 · Hands-on · 10 min', title:'Map evidence to your criteria', bg:'#7A0019', key:'a2',
-           setup:'Open your promotion guidelines. The left column uses their words, not mine.',
-           steps:[ {time:'6 min',text:'List evidence you hold; map at least three items.'}, {time:'—',text:'Flag your single biggest gap.'}, {time:'3 min',text:'Trade workbooks: strongest piece? what is missing?'} ] },
-      3: { kicker:'Activity 3 · Hands-on · 4 min', title:'Your 90-day plan and mentors', bg:'#990000', key:'a3',
-           setup:'Three small, specific moves for the next 90 days. Specific beats ambitious.',
-           steps:[ {time:'3 min',text:'Three moves, starting from your biggest gap.'}, {time:'—',text:'Name two mentors to contact this month.'}, {time:'1 min',text:'Swap one commitment with a partner.'} ] },
+  deckSlides() {
+    return [
+      { type:'title', dark:true, kicker:'Parallel session · 3:00 – 3:45 PM', title:'Make the Case',
+        title2:'Building a Teaching Portfolio for Promotion',
+        lead:'A working session for early- and mid-career teaching-track computer science faculty. Balanced format: worked examples plus hands-on activities.',
+        foot:'Workbook · go.iu.edu/X6qsp2' },
+      { type:'agenda', kicker:'45 minutes, three hands-on activities', title:'Agenda',
+        blocks:[
+          {label:'4 min', text:'A portfolio is an argument, not an archive'},
+          {label:'7 min', text:'How it works for teaching-track CS, and the rank ladder'},
+          {label:'6 min', text:'Components, CS evidence, and a worked example'},
+          {label:'9 min', text:'Activity 1 · Draft your narrative core', hot:true},
+          {label:'10 min', text:'Activity 2 · Map evidence to your criteria', hot:true},
+          {label:'4 min', text:'The hard parts: ratings, scale, scholarship'},
+          {label:'4 min', text:'Activity 3 · Your 90-day plan and mentors', hot:true},
+          {label:'1 min', text:'Close, resources, and the ask'},
+        ],
+        foot:'Balanced split: 23 minutes hands-on, 22 minutes of guidance and discussion.' },
+      { type:'bigidea', dark:true, kicker:'The one idea',
+        title:'A teaching portfolio is an argument, not an archive.',
+        lead:'You are not assembling a scrapbook of everything you have ever taught. You are making a case: here is the kind of teacher I am, here is the evidence, and here is why my choices produced it.',
+        foot:'Why this matters now. Institutions such as Hamilton and Colorado State are revising promotion rules to de-emphasize student ratings and require multiple measures of teaching.' },
+      { type:'generic', kicker:'What promotion actually asks', title:'The teaching-track ladder',
+        lead:'Teaching-track ranks expect excellence across teaching, scholarship (distinct from research), and service. The bar rises at each step — build evidence for the step you are reaching toward.',
+        blocks:[
+          {label:'Assistant → Associate Teaching Professor', text:'Strong in the classroom and a curricular innovator. A significant role in the educational mission. A positive mentor to TAs. Clear potential for educational leadership.'},
+          {label:'Associate → Teaching Professor', text:'Sustained classroom excellence. Educational leadership: novel methods, new courses, program work. Scholarship with national visibility. Mentoring junior faculty.'},
+          {label:'The constant thread', text:'Excellence in teaching, scholarship, and service at every rank. Service and leadership rise with seniority. DEI contributions count across all three.'},
+        ],
+        foot:'What external reviewers are asked. Letters compare you to peers at a similar career stage and judge national recognition. (UW Allen School CSE criteria.)' },
+      { type:'generic', kicker:'By 4:00 you will have', title:'Three things you build today, with your own material',
+        blocks:[
+          {label:'A narrative core', text:'One true sentence: your claim as a teacher, the evidence, and the reasoning behind it.'},
+          {label:'An evidence inventory', text:'Your real evidence mapped to specific criteria in your own promotion guidelines.'},
+          {label:'A 90-day plan', text:'Three concrete next moves and one accountability partner to keep you honest.'},
+        ],
+        foot:'Grounded in current practice. These mirror what review committees now ask for: multiple measures of teaching seen through several lenses.' },
+      { type:'generic', kicker:'How the portfolio works', title:'Two versions: highlights and archive',
+        blocks:[
+          {label:'Public · highlights', text:'Selected, curated, argued.', items:['What the committee actually reads','Every item earns its place by supporting a claim','Front-load the table of contents and teaching statement']},
+          {label:'Private · archive', text:'Everything, kept current.', items:['A folder you add to all semester','Ratings, artifacts, emails, peer notes, grant letters','So you never rebuild from memory the year you go up']},
+        ],
+        foot:'Start the archive this week. The highlights version is easy once the archive exists. (Drake Institute: summative vs formative.)' },
+      { type:'generic', kicker:'The structure of every section', title:'Claim, evidence, reasoning',
+        blocks:[
+          {label:'Claim', text:'“I am an effective teacher.” The thing you want the committee to believe.'},
+          {label:'Evidence', text:'“Here is what my students do, and how they rate it.” Artifacts, outcomes, ratings, peer observation.'},
+          {label:'Reasoning', text:'“Because I make intentional, research-informed choices.” The part committees almost never get — this is what makes your case.'},
+        ],
+        foot:'Evidence from four lenses (Brookfield): students, peers, self-reflection, and the research literature. Aim for at least two lenses behind every claim.' },
+      { type:'generic', kicker:'What goes in', title:'The components map',
+        blocks:[
+          {label:'Table of contents', text:'Headings and page numbers.'},
+          {label:'Teaching statement', text:'A scholarly analysis, not a feelings essay.'},
+          {label:'Course descriptions', text:'Level, size, modality, your role, innovations.'},
+          {label:'Course materials', text:'Syllabus, signature project, student work.'},
+          {label:'Evidence of learning', text:'Ratings plus outcomes beyond ratings.'},
+          {label:'Peer & professional', text:'Observations, TA supervision, scholarship.'},
+        ],
+        foot:'Current guidance: document teaching with multiple measures, not ratings alone.' },
+      { type:'generic', kicker:'Make the invisible count', title:'Name your CS-ed work as scholarship',
+        lead:'On the teaching track, scholarship is distinct from research and it counts. Use Boyer\u2019s categories; teaching-track work usually weighs toward Integration and Application.',
+        blocks:[
+          {label:'Discovery', text:'New knowledge through research: peer-reviewed papers, new infrastructure.'},
+          {label:'Integration', text:'Across disciplines: textbooks, literature reviews, new curriculum.'},
+          {label:'Application', text:'Serving the profession: consulting, leadership, mentoring student leaders.'},
+        ],
+        foot:'Counts as scholarship for teaching faculty (UW Allen School): OER & textbooks, course/curriculum redesign, new pedagogy, education grants, peer review, SIGCSE / ITiCSE / ICER papers, invited talks, accreditation work.' },
+      { type:'generic', kicker:'Worked example', title:'One CS1 course becomes an argument',
+        lead:'Intro programming (CS1): a high-failure gateway course.',
+        blocks:[
+          {label:'Claim', text:'I make a high-failure gateway course survivable without lowering the bar.'},
+          {label:'Evidence', text:'DFW rate fell over four semesters. The first-gen vs continuing-gen gap narrowed. Project artifacts show the same standard met.'},
+          {label:'Reasoning', text:'I rebuilt the course around specifications grading and an autograder giving instant feedback, so students iterate instead of guessing — plus structured pair programming in lab.'},
+        ],
+        foot:'Backed by current research: mastery and specifications grading show DFW and equity-gap gains in CS1 (SIGCSE 2024). Three sentences beat ten pages of raw syllabi.' },
+      { type:'activity', timerKey:'a1', kicker:'Hands-on · 9 min', title:'Activity 1 · Draft your narrative core',
+        lead:'Fill in: “I am an effective teacher because I make intentional choices such as ____, and as a result my students ____.”',
+        blocks:[
+          {label:'Write · 7 min', text:'Silent, rough draft for one course. Do not polish.'},
+          {label:'Avoid two traps', text:'Writing what you wish were true; listing activities with no result attached.'},
+          {label:'Surface · 2 min', text:'A few volunteers read; we locate the claim, evidence, and reasoning.'},
+        ],
+        foot:'Workbook · Activity 1' },
+      { type:'table', kicker:'Reference for Activity 2', title:'The CS evidence bank',
+        blocks:[
+          {label:'Teaching statement', text:'How people learn to program; closing the novice-to-expert gap; broadening participation in computing.'},
+          {label:'Course descriptions', text:'Level (CS1, systems, theory), size, modality, your role, innovations (pair programming, peer instruction, specs grading).'},
+          {label:'Course materials', text:'Annotated syllabus, signature project, an autograder or test suite you built, rubrics, anonymized student work.'},
+          {label:'Ratings', text:'5–7 items trended over time, by course type; comments grouped into 4–5 themes with one honest growth area.'},
+          {label:'Learning outcomes', text:'Concept-inventory gains (e.g. SCS1), pass and DFW rates, equity-gap movement, retention into the next course.'},
+          {label:'Peer & professional', text:'Peer observations, TA training, curriculum work, OER, SIGCSE / ITiCSE / ICER papers, pedagogical grants, awards.'},
+          {label:'AI-era adaptation', text:'How you redesigned assignments, integrity policy, and assessment for generative AI, with outcomes since the change.'},
+        ] },
+      { type:'activity', timerKey:'a2', kicker:'Hands-on · 10 min', title:'Activity 2 · Map evidence to your criteria',
+        lead:'Open your institution\u2019s promotion guidelines. The left column of your map uses THEIR words, not mine.',
+        blocks:[
+          {label:'Solo · 6 min', text:'List evidence you hold. Map at least three items to a specific criterion. Flag your biggest gap.'},
+          {label:'Count what you overlook', text:'TA mentoring, an open-source assignment set, a workshop you ran, a grant.'},
+          {label:'Pair share · 3 min', text:'Trade maps: what is the strongest piece here, and what is missing?'},
+        ],
+        foot:'Workbook · Activity 2' },
+      { type:'generic', kicker:'The questions you actually get stuck on', title:'The hard parts',
+        blocks:[
+          {label:'Biased ratings', text:'Never lead with a raw average. Show context and trend; pair with concept gains, DFW data, peer observation.'},
+          {label:'Teaching at scale', text:'Make the systems your evidence: autograders, TA training, mastery schemes, rubrics that keep sections consistent.'},
+          {label:'Shared courses', text:'State your specific contribution plainly. Back it with a co-instructor or course-coordinator letter.'},
+          {label:'CS ed as scholarship', text:'Name it: SIGCSE / ITiCSE / ICER work, OER, adopted tools, curriculum redesign. Map to your guidelines\u2019 category.'},
+        ],
+        foot:'Match the instrument to how you teach (CMU SCS). Ratings alone have limited validity (2024 review); include a rationale for the instrument you chose.' },
+      { type:'generic', kicker:'An innovative insight for 2026', title:'Teaching in the age of generative AI',
+        lead:'Generative AI now solves typical CS1 homework. How you have responded is fresh evidence almost no candidate can yet show.',
+        blocks:[
+          {label:'The shift in the work', text:'Courses move toward higher-level problem solving, code reading and critique, process, and in-class or oral assessment (ACM 2023; SIGCSE 2024–26).'},
+          {label:'New teaching models', text:'Custom AI tutors approximate one-to-one help (e.g. CS50\u2019s AI tutor); frameworks like AI-Lab teach ethical, skill-preserving AI use.'},
+          {label:'Integrity, redesigned', text:'A clear, teachable AI-use policy plus assessment AI cannot shortcut is itself a documented teaching contribution.'},
+          {label:'Why it is portfolio gold', text:'Before-and-after assignment redesigns, your policy, new assessment formats, and outcomes read as current, in-demand evidence.'},
+        ] },
+      { type:'activity', timerKey:'a3', kicker:'Hands-on · 4 min', title:'Activity 3 · Your 90-day plan and mentors',
+        lead:'Three small moves for the next 90 days. Specific beats ambitious.',
+        blocks:[
+          {label:'Solo · 3 min', text:'Three moves, your biggest gap from Activity 2, and the first step to close it.'},
+          {label:'Seek mentors', text:'Name two to contact this month: a recently promoted peer and a senior committee veteran.'},
+          {label:'Partner up · 1 min', text:'Swap one commitment and contact info; join the peer group.'},
+        ],
+        foot:'Workbook · Activity 3' },
+      { type:'generic', kicker:'Take these with you', title:'Resources',
+        blocks:[
+          {label:'Seldin (2004), The Teaching Portfolio', text:'The components model behind this session.'},
+          {label:'Your promotion guidelines', text:'The single most important document. Everything maps to its language.'},
+          {label:'CRA-E & SIGCSE materials', text:'Professional development for teaching-track faculty (the model for this event).'},
+          {label:'Learning-gain evidence', text:'CS concept inventory SCS1; mastery and specifications grading (SIGCSE 2024).'},
+          {label:'SET bias & reform', text:'MacNell et al.; Boring; 2024 validity review and the move to multiple measures.'},
+          {label:'Generative AI in CS', text:'ACM “Generative AI in Introductory Programming” (2023) and SIGCSE 2024–26 work.'},
+        ],
+        foot:'More in the workbook\u2019s Resources tab, with live links.' },
+      { type:'close', dark:true, kicker:'Before you leave', title:'Start your archive this week.',
+        lead:'The portfolio is not a document you write the year you go up. It is an archive you keep and an argument you assemble. The teacher who starts the folder today is the one who is ready.',
+        foot:'Thank you. Find me for follow-up at AKMHORTO@IU.EDU' },
+    ];
+  }
+
+  deckData() {
+    const slides = this.deckSlides();
+    const idx = Math.min(slides.length-1, Math.max(0, this.state.slideIdx));
+    const raw = slides[idx];
+    const blocks = (raw.blocks||[]).map(b => ({
+      label:b.label||'', text:b.text||'', hot:!!b.hot,
+      items:(b.items||[]).map(x=>({text:x})), hasItems:!!(b.items&&b.items.length),
+    }));
+    let timer = { show:false };
+    if (raw.timerKey) {
+      const t = this.state.timers[raw.timerKey];
+      timer = { show:true, display:this.fmt(t.r),
+        label: t.run ? 'Pause' : (t.r < t.init ? 'Resume' : 'Start timer'),
+        color: t.r===0 ? '#E3A7AC' : '#fff',
+        toggle: this.startStop(raw.timerKey), reset: this.resetTimer(raw.timerKey) };
+    }
+    // card grid columns by count
+    const n = blocks.length;
+    const cols = n <= 2 ? n : (n === 4 ? 2 : (n >= 5 ? 3 : 3));
+    const dark = !!raw.dark;
+    const theme = dark ? {
+      bg:'#2C2521', fg:'#F9F3EA', kickerColor:'#E3A7AC', counterColor:'rgba(249,243,234,.6)',
+      cardBg:'rgba(255,255,255,.06)', cardBorder:'rgba(255,255,255,.16)', cardLabel:'#F0C9B0',
+      footColor:'rgba(249,243,234,.72)', footBorder:'rgba(255,255,255,.16)',
+      navBorder:'rgba(255,255,255,.3)', navColor:'#F9F3EA', barTrack:'rgba(255,255,255,.18)', barFill:'#E3A7AC',
+    } : {
+      bg:'#F6EFDE', fg:'#2C2521', kickerColor:'#990000', counterColor:'#8A8472',
+      cardBg:'#FFFDF8', cardBorder:'#E7E1D5', cardLabel:'#7A0019',
+      footColor:'#5B6B7A', footBorder:'#E4DECF',
+      navBorder:'#D8CFC0', navColor:'#2C2521', barTrack:'#E6E0D2', barFill:'#990000',
     };
-    const def = defs[a];
-    const t = this.state.timers[def.key];
-    return { ...def, timer: this.fmt(t.r), timerLabel: t.run ? 'Pause' : (t.r < t.init ? 'Resume' : 'Start timer'),
-      toggle: this.startStop(def.key), reset: this.resetTimer(def.key) };
+    return {
+      idx, total: slides.length, num: String(idx+1).padStart(2,'0'), totalStr: String(slides.length).padStart(2,'0'),
+      cur: raw, blocks, cols, dark, ...theme,
+      kicker: raw.kicker||'', title: raw.title||'', title2: raw.title2||'', lead: raw.lead||'', foot: raw.foot||'',
+      hasTitle2: !!raw.title2, hasLead: !!raw.lead, hasFoot: !!raw.foot, hasBlocks: blocks.length>0,
+      isTitle: raw.type==='title', isBigidea: raw.type==='bigidea', isAgenda: raw.type==='agenda',
+      isActivity: raw.type==='activity', isTable: raw.type==='table', isClose: raw.type==='close',
+      isCards: raw.type==='generic' || raw.type==='activity',
+      atStart: idx===0, atEnd: idx===slides.length-1,
+      timer,
+      progressPct: Math.round(100*(idx+1)/slides.length),
+    };
   }
 
   async getFb(which) {
@@ -1229,6 +1496,26 @@ class Component extends DCLogic {
           { label:'Learning Portfolio Program', url:'https://www.luc.edu/celts/programs/learningportfolio/' },
           { label:'Faculty/staff portfolio track', url:'https://www.luc.edu/experiential/learningportfolio/facultstaff.shtml' },
         ] },
+      { name:'Boston University', center:'Institute for Excellence in Teaching & Learning (formerly the CTL)', url:'https://www.bu.edu/excellence/',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' BU recently folded its Center for Teaching & Learning into this Institute, and it no longer publishes a standalone portfolio page. Portfolio support now runs through Teaching Strategies & Professional Development and one-to-one teaching consultations, where you can workshop a teaching statement or portfolio draft and arrange a class observation.' },
+          { lead:'', text:'Its Scholarship of Teaching & Learning support helps you turn CS-education work into documented portfolio evidence.' },
+          { lead:'', text:'Read your school/college and university promotion guidelines, then use a consultation to align your portfolio to their categories.' },
+        ],
+        keyPages:[
+          { label:'Teaching & Professional Development', url:'https://www.bu.edu/excellence/programs-services/faculty-development/' },
+          { label:'Resources & Strategies', url:'https://www.bu.edu/excellence/resources-strategies/' },
+        ] },
+      { name:'University of Texas at Arlington (UTA)', center:'Center for Research on Teaching and Learning Excellence (CRTLE)', url:'https://www.uta.edu/administration/crtle',
+        bullets:[
+          { lead:'Teaching-portfolio help:', text:' CRTLE doesn\u2019t publish a standalone portfolio page, but its Teaching Consultation & Observation service and Formal Peer Observation produce exactly the peer-evidence and reflective feedback a portfolio needs. Email CRTLE@uta.edu for a consultation on a teaching statement or portfolio draft.' },
+          { lead:'', text:'ACUE certification, CRTLE Faculty Fellows, and the CIRTL-UTA Teaching Certificate generate documented, evidence-based teaching to draw on; CRTLE is your CIRTL-network campus hub.' },
+          { lead:'', text:'Pair with the Division of Faculty Success and your department\u2019s promotion guidelines for the exact criteria your dossier maps to.' },
+        ],
+        keyPages:[
+          { label:'Teaching Consultation & Observation', url:'https://www.uta.edu/administration/crtle/teaching-consultation-and-observation' },
+          { label:'Programs', url:'https://www.uta.edu/administration/crtle/programs' },
+        ] },
     ];
     const csGroups = [
       { heading:'Career and professional development', items:[
@@ -1310,7 +1597,7 @@ class Component extends DCLogic {
       .filter(([n,m]) => m.trim())
       .map(([n,m,by]) => ({ n, text:m, by, hasBy: !!by.trim() }));
     const mentors = [d.mentor1,d.mentor2].filter(x=>x.trim());
-    const presD = this.presentData();
+    const deck = this.deckData();
 
     const res = this.resourceData();
 
@@ -1390,9 +1677,9 @@ class Component extends DCLogic {
       // timers
       t1:this.timerObj('a1'), t2:this.timerObj('a2'), t3:this.timerObj('a3'),
 
-      // present
+      // present / deck
       present:s.present, openPresent:this.openPresent, closePresent:this.closePresent,
-      presPrev:this.presStep(-1), presNext:this.presStep(1), pres:presD,
+      deckPrev:this.deckStep(-1), deckNext:this.deckStep(1), deck,
 
       // skeleton
       skeletonKicker: doneAll ? 'You built it' : 'Your working skeleton',
